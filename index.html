@@ -72,7 +72,6 @@ input::placeholder {color: var(--txt3);}
 .gen-txt { color:rgba(255,255,255,0.5); font-size:12px; line-height:1.6; }
 .gen-btn { margin-top:10px; color:#ff453a; font-weight:700; font-size:14px; cursor:pointer; padding:8px 16px; background:rgba(255,69,58,0.1); border-radius:99px;}
 
-/* İMZA VE VERSİYON (LOGIN) */
 .login-badge { position:absolute; top:24px; right:24px; background:rgba(0,0,0,0.4); color:rgba(255,255,255,0.85); padding:6px 12px; border-radius:999px; font-size:10.5px; font-weight:700; letter-spacing:0.04em; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:0.5px solid rgba(255,255,255,0.15); z-index:10; }
 .login-footer-sig { position:absolute; bottom:24px; left:0; right:0; text-align:center; font-size:11px; color:rgba(255,255,255,0.4); letter-spacing:0.5px; }
 .login-footer-sig strong { color:rgba(255,255,255,0.8); font-weight:800; }
@@ -87,7 +86,7 @@ input::placeholder {color: var(--txt3);}
 .ibtn { width:34px; height:34px; border-radius:50%; background:var(--bg2); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:var(--txt); cursor:pointer;}
 .ibtn:active { transform:scale(0.9); }
 
-/* AY NAVIGASYONU (15'inden 15'ine) */
+/* AY NAVIGASYONU */
 .ay-nav-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; background:var(--surf-solid); padding:10px 16px; border-radius:20px; box-shadow:var(--ios-shadow-sm); border:.5px solid var(--brd); }
 .ay-name { font-weight:800; font-size:13.5px; color:var(--txt); letter-spacing:-0.3px; text-transform:uppercase;}
 
@@ -97,10 +96,9 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .page.on { display:block; animation:fade .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes fade { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
 
-/* GRUPLAMA BAŞLIKLARI */
 .group-lbl { font-size:13px; font-weight:700; color:var(--txt3); text-transform:uppercase; letter-spacing:1px; margin:24px 0 8px 8px; }
 
-/* SWIPE (KAYDIRMA) */
+/* SWIPE */
 .swipe-wrap { position:relative; margin-bottom:10px; border-radius:20px; overflow:hidden; background:var(--surf-solid); box-shadow:var(--ios-shadow-sm); border:.5px solid var(--brd); }
 .swipe-bg { position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center; padding:0 24px; font-weight:800; font-size:14px; z-index:0; opacity:0; transition:opacity .2s; }
 .swipe-left { color:var(--sec); }
@@ -126,6 +124,17 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .b-bar-bg { width:100%; height:12px; background:var(--bg2); border-radius:99px; overflow:hidden; margin:16px 0 8px; }
 .b-bar { height:100%; background:linear-gradient(90deg, var(--prim), var(--prim2)); border-radius:99px; transition:width .5s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .b-info { display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--txt2); }
+
+/* AKILLI ASİSTAN (YENİ) */
+.ai-card { background:var(--surf-solid); border-radius:24px; padding:18px 20px; box-shadow:var(--ios-shadow-sm); border:.5px solid rgba(52, 199, 89, 0.3); margin-bottom:20px; display:none; animation:fade .4s ease; border-left:4px solid var(--sec);}
+.ai-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.ai-ttl { font-size:13px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--txt);}
+.ai-icon { font-size:18px; }
+.ai-tag { font-size:9.5px; font-weight:800; background:var(--sec-bg); color:var(--sec); padding:3px 8px; border-radius:99px; letter-spacing:0.5px; text-transform:uppercase; }
+.ai-txt { font-size:13.5px; color:var(--txt2); line-height:1.5; font-weight:500;}
+.ai-action { display:flex; margin-top:12px; gap:8px; }
+.ai-btn { padding:6px 12px; background:var(--bg2); border-radius:99px; font-size:11px; font-weight:700; color:var(--txt2); cursor:pointer; }
+.ai-btn:active { transform:scale(0.95); }
 
 /* KİM NE HARCADI */
 .u-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:.5px solid var(--brd); }
@@ -154,8 +163,6 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .fixed-add-bar input { flex:1; background:var(--bg); border-radius:18px; padding:14px 16px; font-size:15px; font-weight:500; color:var(--txt); }
 .add-btn { width:48px; height:48px; border-radius:18px; background:var(--prim); color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; cursor:pointer;}
 .add-btn:active { transform:scale(0.9); }
-
-/* HARCAMA EKLEME İÇİN ÖZEL ÇUBUK */
 .h-inputs { display:flex; gap:8px; flex:1; }
 .h-inputs input { width:50%; }
 
@@ -175,6 +182,7 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .inp-lbl { font-size:12px; font-weight:800; color:var(--txt3); margin-bottom:8px; display:block; text-transform:uppercase; letter-spacing:1px;}
 .mod-inp { width:100%; background:var(--bg2); padding:16px; border-radius:16px; font-size:18px; font-weight:700; color:var(--txt); text-align:center; margin-bottom:16px;}
 .mod-btn { width:100%; padding:16px; border-radius:16px; background:var(--prim); color:#fff; font-size:16px; font-weight:800; cursor:pointer;}
+.mod-sig { text-align:center; margin-top:24px; font-size:10px; color:var(--txt3); letter-spacing:0.5px; font-weight:600;}
 
 .empty { text-align:center; padding:40px 20px; color:var(--txt3); font-size:15px; font-weight:500;}
 
@@ -226,6 +234,17 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
       <button class="ibtn" onclick="ayDegis(1)">›</button>
     </div>
 
+    <div class="ai-card" id="aiCard">
+      <div class="ai-hdr">
+        <div class="ai-ttl"><span class="ai-icon">✨</span>Akıllı Asistan</div>
+        <div class="ai-tag" id="aiTag">ANALİZ</div>
+      </div>
+      <div class="ai-txt" id="aiTxt">Finansal verileriniz analiz ediliyor...</div>
+      <div class="ai-action">
+        <button class="ai-btn" onclick="akilliOneriYenile()">Başka Öneri</button>
+      </div>
+    </div>
+
     <div class="card">
       <div class="c-ttl"><span>Aylık Kalan Bütçe</span> <span onclick="modalAc('mBakiye')" style="cursor:pointer;color:var(--prim)">LİMİTİ DEĞİŞTİR</span></div>
       <div class="budget-val" id="bKalan">₺0</div>
@@ -267,7 +286,7 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
     <label class="inp-lbl">Seçili Ay Bütçe Limiti (₺)</label>
     <input type="number" id="yeniLimit" class="mod-inp">
     <button class="mod-btn" onclick="limitKaydet()">Kaydet</button>
-    <div style="text-align:center; margin-top:24px; font-size:10px; color:var(--txt3); letter-spacing:0.5px;">Tasarım &amp; Fikir: <strong>ysfykc</strong> • v1.0</div>
+    <div class="mod-sig">Tasarım &amp; Fikir: <strong>ysfykc</strong> • v1.0</div>
   </div>
 </div>
 
@@ -286,15 +305,12 @@ let veri = { aylar: {}, liste: [], silinenListe: [] };
 let unsubscribe = null;
 let oncekiUrunSayisi = -1; 
 let aktifAy = getPeriodId(); 
+let asistanIndex = 0;
 
 function getPeriodId(dStr) {
   const d = dStr ? new Date(dStr) : new Date();
-  let y = d.getFullYear();
-  let m = d.getMonth() + 1;
-  if (d.getDate() < 15) {
-    m -= 1;
-    if (m === 0) { m = 12; y -= 1; }
-  }
+  let y = d.getFullYear(), m = d.getMonth() + 1;
+  if (d.getDate() < 15) { m -= 1; if (m === 0) { m = 12; y -= 1; } }
   return `${y}-${String(m).padStart(2, '0')}`;
 }
 
@@ -320,17 +336,12 @@ async function initFb() {
   onAuthStateChanged(auth, u => {
     user = u;
     if(u) {
-      if(!evKodu) {
-        document.getElementById('login').style.display = 'flex';
-      } else {
-        document.getElementById('login').style.display = 'none';
-        canliBaglantiKur();
-      }
+      if(!evKodu) { document.getElementById('login').style.display = 'flex'; } 
+      else { document.getElementById('login').style.display = 'none'; canliBaglantiKur(); }
     } else {
       document.getElementById('login').style.display = 'flex';
     }
   });
-  
   if(localStorage.getItem('evTema')==='dark') temaDegis(true);
 }
 
@@ -375,12 +386,10 @@ function dataMigration(parsed) {
       v.aylar[pId].harcamalar.push(h);
     });
     v.silinenListe = [];
-    delete v.harcamalar;
-    delete v.limit;
+    delete v.harcamalar; delete v.limit;
   }
   if (!v.liste) v.liste = [];
   if (!v.silinenListe) v.silinenListe = [];
-
   if (!v.aylar[aktifAy]) {
     let prevLimit = 0;
     let keys = Object.keys(v.aylar).sort();
@@ -402,7 +411,6 @@ function canliBaglantiKur() {
       try {
         const parsed = JSON.parse(snap.data().json || '{}');
         veri = dataMigration(parsed);
-
         const gUrunS = veri.liste.length;
         if (oncekiUrunSayisi !== -1 && gUrunS > oncekiUrunSayisi) {
            const sUrun = veri.liste[gUrunS - 1];
@@ -413,9 +421,7 @@ function canliBaglantiKur() {
         }
         oncekiUrunSayisi = gUrunS;
       } catch(e) { veri = dataMigration({}); }
-    } else {
-      veri = dataMigration({});
-    }
+    } else { veri = dataMigration({}); }
     render();
   });
 }
@@ -429,15 +435,10 @@ async function veriyiGuncelle() {
     await setDoc(doc(db, 'households', evKodu), { json: JSON.stringify(veri) });
     document.getElementById('syncText').textContent = 'Senkronize';
     document.querySelector('.sync-dot').style.background = 'var(--sec)';
-  } catch(error) {
-    showToast('❌ İzin Hatası!');
-  }
+  } catch(error) { showToast('❌ İzin Hatası!'); }
 }
 
-function userName() {
-  if(!user) return "Anonim";
-  return user.displayName ? user.displayName.split(' ')[0] : "Birisi";
-}
+function userName() { return !user ? "Anonim" : (user.displayName ? user.displayName.split(' ')[0] : "Birisi"); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,4); }
 
 /* --- İŞLEMLER --- */
@@ -481,9 +482,7 @@ function harcamaEkle() {
   const ad = document.getElementById('hAd').value.trim();
   const tutar = parseFloat(document.getElementById('hTutar').value);
   if(!ad || !tutar) return showToast("⚠️ Alanları doldurun");
-  
   veri.aylar[aktifAy].harcamalar.push({ id: uid(), ad: ad, tutar: tutar, ekleyen: userName(), tarih: new Date().toISOString() });
-  
   document.getElementById('hAd').value = '';
   document.getElementById('hTutar').value = '';
   render(); veriyiGuncelle();
@@ -535,9 +534,7 @@ function ayDegis(delta) {
     if(keys.length > 0) prevLimit = veri.aylar[keys[keys.length-1]].limit;
     veri.aylar[aktifAy] = { limit: prevLimit, harcamalar: [], silinenHarcamalar: [] };
     veriyiGuncelle();
-  } else {
-    render();
-  }
+  } else { render(); }
 }
 
 function showToast(msg) {
@@ -546,22 +543,81 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('on'), 3000);
 }
 
+/* YZ ASİSTAN ALGORİTMASI */
+function asistanTavsiyeleri() {
+  const v = veri.aylar[aktifAy];
+  const lim = v.limit || 0;
+  const harcamalar = v.harcamalar || [];
+  const harcanan = harcamalar.reduce((s, x) => s + x.tutar, 0);
+  const pct = lim ? (harcanan / lim) * 100 : 0;
+  const kalan = lim - harcanan;
+  
+  const liste = [];
+  
+  if(lim === 0 && harcamalar.length === 0) return [{tag:"HOŞ GELDİNİZ", txt:"Aylık bütçe limitinizi belirleyip ilk harcamanızı girerek asistanı uyandırın."}];
+  if(lim > 0 && harcamalar.length === 0) liste.push({tag:"PLANLAMA", txt:"Bütçe limitiniz hazır. Harcamalarınızı ekledikçe size özel tasarruf tavsiyeleri üreteceğim."});
+  
+  // Yüzde Analizi
+  if(pct > 90) liste.push({tag:"KRİTİK SEVİYE", txt:`Bütçenizin %${Math.round(pct)}'sini tükettiniz. Kalan ${kalan.toLocaleString('tr-TR')} TL ile dönemi kapatmak için dikkatli harcama yapın.`});
+  else if(pct > 75) liste.push({tag:"DİKKAT", txt:"Bütçe limitinizin büyük kısmı kullanıldı. Kalan günlerde büyük harcamaları ertelemek faydalı olabilir."});
+  else if(pct < 40 && harcamalar.length > 4) liste.push({tag:"HARİKA GİDİŞAT", txt:"Bütçe yönetiminiz şu an mükemmel ilerliyor. Bu disiplinle ay sonunda ciddi tasarruf edebilirsiniz."});
+  
+  // Kelime / Kategori Analizi
+  if(harcamalar.length > 2) {
+     const kGrup = {};
+     harcamalar.forEach(h => {
+        const kelime = h.ad.split(' ')[0].toUpperCase();
+        if(kelime.length > 2) kGrup[kelime] = (kGrup[kelime] || 0) + h.tutar;
+     });
+     const enBuyuk = Object.entries(kGrup).sort((a,b)=>b[1]-a[1])[0];
+     if(enBuyuk && enBuyuk[1] > (lim * 0.15) && lim > 0) {
+        liste.push({tag:"HARCAMA ANALİZİ", txt:`Bu dönem "${enBuyuk[0]}" harcamaları bütçenizin önemli bir kısmını (${enBuyuk[1].toLocaleString('tr-TR')} TL) oluşturuyor. Gözden geçirmek isteyebilirsiniz.`});
+     }
+  }
+
+  // Takım Analizi
+  const km = {}; harcamalar.forEach(x => { km[x.ekleyen] = (km[x.ekleyen] || 0) + x.tutar; });
+  const kArr = Object.keys(km);
+  if(kArr.length > 1) liste.push({tag:"TAKIM İŞİ", txt:`${kArr.join(' ve ')} bütçeye birlikte yön veriyor. Ortak finansal takip, ev ekonomisinin en büyük gücüdür!`});
+  
+  // Market Bağlantısı
+  const marketKalan = veri.liste.filter(x => !x.alindi).length;
+  if(marketKalan > 4 && kalan < (lim * 0.2) && lim > 0) {
+     liste.push({tag:"MARKET UYARISI", txt:`Market listenizde alınmayı bekleyen ${marketKalan} ürün var ancak bütçeniz epey azalmış. Önceliklendirme yapmanız gerekebilir.`});
+  }
+
+  if(liste.length === 0) liste.push({tag:"GÖZLEM", txt:"Harcama verileriniz dengeli görünüyor. Siz harcamalarınızı girdikçe analiz etmeye devam edeceğim."});
+  
+  return liste;
+}
+
+function renderAsistan() {
+  const c = document.getElementById('aiCard');
+  if(!veri.aylar || !veri.aylar[aktifAy]) { c.style.display='none'; return; }
+  
+  const list = asistanTavsiyeleri();
+  if(list.length > 0) {
+    c.style.display = 'block';
+    const s = list[asistanIndex % list.length];
+    document.getElementById('aiTag').textContent = s.tag;
+    document.getElementById('aiTxt').textContent = s.txt;
+  } else { c.style.display = 'none'; }
+}
+
+function akilliOneriYenile() {
+  asistanIndex++;
+  renderAsistan();
+}
+
 /* SWIPE HTML ÜRETİCİ */
 function createSwipeItem(id, htmlContent, isAlindi, tip) {
   const solText = isAlindi ? 'Geri Al' : '✓ Alındı';
   const leftAct = tip === 'harcama' ? '' : `<div class="swipe-left">${solText}</div>`;
-  
   return `
     <div class="swipe-wrap" id="sw-${id}">
-      <div class="swipe-bg" id="sbg-${id}">
-        ${leftAct}
-        <div class="swipe-right" style="${tip === 'harcama' ? 'width:100%;text-align:right;' : ''}">Sil 🗑</div>
-      </div>
-      <div class="swipe-content" id="sc-${id}" data-id="${id}" data-tip="${tip}">
-        ${htmlContent}
-      </div>
-    </div>
-  `;
+      <div class="swipe-bg" id="sbg-${id}">${leftAct}<div class="swipe-right" style="${tip === 'harcama' ? 'width:100%;text-align:right;' : ''}">Sil 🗑</div></div>
+      <div class="swipe-content" id="sc-${id}" data-id="${id}" data-tip="${tip}">${htmlContent}</div>
+    </div>`;
 }
 
 function buildDeletedHtml(list, tip) {
@@ -574,10 +630,7 @@ function buildDeletedHtml(list, tip) {
       <div class="deleted-body">
         ${list.map(x => `
           <div class="d-item">
-            <div class="d-info">
-              <div class="d-name">${x.ad} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div>
-              <div class="d-meta">${x.ekleyen} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div>
-            </div>
+            <div class="d-info"><div class="d-name">${x.ad} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div><div class="d-meta">${x.ekleyen} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div></div>
             <div class="d-actions">
               <button class="d-btn" onclick="${tip==='harcama' ? 'harcamaGeriAl' : 'urunGeriAl'}('${x.id}')">Geri Al</button>
               <button class="d-btn red" onclick="${tip==='harcama' ? 'harcamaKaliciSil' : 'urunKaliciSil'}('${x.id}')">Sil</button>
@@ -585,8 +638,7 @@ function buildDeletedHtml(list, tip) {
           </div>
         `).join('')}
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 /* RENDER */
@@ -600,24 +652,17 @@ function render() {
   } else {
     const alinacaklar = veri.liste.filter(x => !x.alindi);
     const alinanlar = veri.liste.filter(x => x.alindi);
-    
     let html = '';
     if(alinacaklar.length > 0) {
       html += '<div class="group-lbl">Alınacaklar</div>';
       html += alinacaklar.map(x => createSwipeItem(x.id, `
-        <div class="l-info" onclick="toggleAlindi('${x.id}')">
-          <div class="chk"></div>
-          <div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span></div></div>
-        </div>
+        <div class="l-info" onclick="toggleAlindi('${x.id}')"><div class="chk"></div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span></div></div></div>
       `, false, 'urun')).join('');
     }
     if(alinanlar.length > 0) {
       html += '<div class="group-lbl" style="margin-top:30px">Alınanlar</div>';
       html += alinanlar.map(x => createSwipeItem(x.id, `
-        <div class="l-info" onclick="toggleAlindi('${x.id}')">
-          <div class="chk on"></div>
-          <div class="l-texts"><div class="l-name done">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span></div></div>
-        </div>
+        <div class="l-info" onclick="toggleAlindi('${x.id}')"><div class="chk on"></div><div class="l-texts"><div class="l-name done">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span></div></div></div>
       `, true, 'urun')).join('');
     }
     lKutu.innerHTML = html;
@@ -646,10 +691,7 @@ function render() {
   if(kisiler.length > 0) {
     kKutu.style.display = 'block';
     document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `
-      <div class="u-row">
-        <div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div>
-        <div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div>
-      </div>
+      <div class="u-row"><div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>
     `).join('');
   } else { kKutu.style.display = 'none'; }
 
@@ -660,15 +702,12 @@ function render() {
   } else {
     const siraliH = [...ayVeri.harcamalar].sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
     hKutu.innerHTML = siraliH.map(x => createSwipeItem(x.id, `
-      <div class="l-info">
-        <div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div>
-        <div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${new Date(x.tarih).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}</div></div>
-      </div>
-      <div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>
+      <div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${new Date(x.tarih).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>
     `, false, 'harcama')).join('');
   }
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
+  renderAsistan();
   baglaSwipe();
 }
 
@@ -676,79 +715,33 @@ function render() {
 function baglaSwipe() {
   document.querySelectorAll('.swipe-content').forEach(el => {
     let sx=0, cx=0, swiping=false, moved=false;
-    const id = el.dataset.id;
-    const tip = el.dataset.tip; 
-    const bg = document.getElementById('sbg-'+id);
-
-    el.addEventListener('touchstart', e => {
-      sx = e.touches[0].clientX; swiping = true; moved = false; cx = 0;
-      el.style.transition = 'none';
-      if(bg) bg.style.transition = 'none';
-    }, {passive:true});
-
+    const id = el.dataset.id, tip = el.dataset.tip, bg = document.getElementById('sbg-'+id);
+    el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; swiping = true; moved = false; cx = 0; el.style.transition = 'none'; if(bg) bg.style.transition = 'none'; }, {passive:true});
     el.addEventListener('touchmove', e => {
       if(!swiping) return;
       const dx = e.touches[0].clientX - sx;
       if(!moved && Math.abs(dx) > 10) moved = true;
-      if(!moved) return;
-      
-      if(tip === 'harcama' && dx > 0) return;
-
+      if(!moved || (tip === 'harcama' && dx > 0)) return;
       cx = dx;
       if(cx > 100) cx = 100 + (cx-100)*0.2;
       if(cx < -100) cx = -100 + (cx+100)*0.2;
-      
       el.style.transform = `translateX(${cx}px)`;
-      
-      if(bg) {
-        bg.style.opacity = Math.min(1, Math.abs(cx)/60);
-        if(tip !== 'harcama') bg.querySelector('.swipe-left').style.opacity = cx > 0 ? 1 : 0;
-        bg.querySelector('.swipe-right').style.opacity = cx < 0 ? 1 : 0;
-      }
+      if(bg) { bg.style.opacity = Math.min(1, Math.abs(cx)/60); if(tip !== 'harcama') bg.querySelector('.swipe-left').style.opacity = cx > 0 ? 1 : 0; bg.querySelector('.swipe-right').style.opacity = cx < 0 ? 1 : 0; }
     }, {passive:true});
-
     el.addEventListener('touchend', () => {
-      if(!swiping || !moved) return;
-      swiping = false;
+      if(!swiping || !moved) return; swiping = false;
       el.style.transition = 'transform .25s cubic-bezier(0.2, 0.8, 0.2, 1)';
       if(bg) bg.style.transition = 'opacity .25s';
-
-      if(cx > 70 && tip !== 'harcama') {
-        el.style.transform = 'translateX(100%)';
-        setTimeout(() => toggleAlindi(id), 250);
-        haptic();
-      } else if(cx < -70) {
-        el.style.transform = 'translateX(-100%)';
-        setTimeout(() => tip === 'harcama' ? harcamaSil(id) : urunSil(id), 250);
-        haptic();
-      } else {
-        el.style.transform = 'translateX(0)';
-        if(bg) bg.style.opacity = 0;
-      }
+      if(cx > 70 && tip !== 'harcama') { el.style.transform = 'translateX(100%)'; setTimeout(() => toggleAlindi(id), 250); haptic(); } 
+      else if(cx < -70) { el.style.transform = 'translateX(-100%)'; setTimeout(() => tip === 'harcama' ? harcamaSil(id) : urunSil(id), 250); haptic(); } 
+      else { el.style.transform = 'translateX(0)'; if(bg) bg.style.opacity = 0; }
     });
   });
 }
 
-function haptic() {
-  if (navigator.vibrate) navigator.vibrate(50);
-}
-
-/* SEKMELER & TEMA */
-function tab(n) {
-  document.querySelectorAll('.page').forEach((e, i) => e.classList.toggle('on', i+1 === n));
-  document.querySelectorAll('.nbtn').forEach((e, i) => e.classList.toggle('on', i+1 === n));
-  document.getElementById('addBarMarket').style.display = n===1 ? 'flex' : 'none';
-  document.getElementById('addBarButce').style.display = n===2 ? 'flex' : 'none';
-  window.scrollTo(0,0);
-}
-
-function temaDegis(forceDark=false) {
-  const isDark = forceDark || document.documentElement.dataset.theme === 'light';
-  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-  document.getElementById('themeColorMeta').content = isDark ? '#000000' : '#f2f2f7';
-  localStorage.setItem('evTema', isDark ? 'dark' : 'light');
-}
-
+function haptic() { if (navigator.vibrate) navigator.vibrate(50); }
+function tab(n) { document.querySelectorAll('.page').forEach((e, i) => e.classList.toggle('on', i+1 === n)); document.querySelectorAll('.nbtn').forEach((e, i) => e.classList.toggle('on', i+1 === n)); document.getElementById('addBarMarket').style.display = n===1 ? 'flex' : 'none'; document.getElementById('addBarButce').style.display = n===2 ? 'flex' : 'none'; window.scrollTo(0,0); }
+function temaDegis(forceDark=false) { const isDark = forceDark || document.documentElement.dataset.theme === 'light'; document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; document.getElementById('themeColorMeta').content = isDark ? '#000000' : '#f2f2f7'; localStorage.setItem('evTema', isDark ? 'dark' : 'light'); }
 document.addEventListener('DOMContentLoaded', initFb);
 </script>
 </body>
