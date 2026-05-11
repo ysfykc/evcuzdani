@@ -79,8 +79,8 @@ input::placeholder {color: var(--txt3);}
 
 /* TOPBAR */
 .topbar { position:fixed; top:0; left:0; right:0; height:var(--top); background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border-bottom:.5px solid var(--brd); display:flex; align-items:center; justify-content:space-between; padding:0 20px; z-index:200; }
-.logo { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-size:22px; font-weight:800; display:flex; align-items:center; gap:10px; letter-spacing:-0.7px; color:var(--txt);}
-.logo-img { width:30px; height:30px; border-radius:7px; box-shadow:var(--ios-shadow-sm); }
+.logo { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-size:18.5px; font-weight:700; display:flex; align-items:center; gap:8px; letter-spacing:-0.5px; color:var(--txt);}
+.logo-img { width:26px; height:26px; border-radius:6px; box-shadow:var(--ios-shadow-sm); }
 .tbr { display:flex; align-items:center; gap:10px; }
 .sync-badge { font-size:11px; background:var(--bg2); padding:5px 10px; border-radius:99px; font-weight:700; display:flex; align-items:center; gap:4px;}
 .sync-dot { width:6px; height:6px; background:var(--sec); border-radius:50%; }
@@ -148,10 +148,6 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .d-btn { padding:8px 12px; border-radius:12px; font-size:11px; font-weight:800; background:var(--bg2); color:var(--txt); cursor:pointer;}
 .d-btn.red { color:var(--prim); }
 .d-btn:active { transform:scale(0.9); }
-
-/* UYGULAMA İÇİ İMZA (Alt Kısım) */
-.footer-sig { text-align:center; padding:32px 20px 20px; font-size:11px; color:var(--txt3); font-weight:600; letter-spacing:0.5px; }
-.footer-sig strong { color:var(--txt2); font-weight:800; }
 
 /* SABİT ALT EKLEME ÇUBUĞU */
 .fixed-add-bar { position:fixed; bottom:calc(var(--nav) + 16px); left:20px; right:20px; background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); padding:8px; border-radius:24px; box-shadow:0 16px 40px rgba(0,0,0,0.15); display:flex; gap:8px; border:.5px solid var(--brd); z-index:150; animation:fadeUp .3s; }
@@ -221,7 +217,6 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
   <div class="page on" id="p1">
     <div id="listeKutusu"></div>
     <div id="marketDeletedContainer"></div>
-    <div class="footer-sig">Tasarım &amp; Fikir: <strong>ysfykc</strong> • v1.0</div>
   </div>
 
   <div class="page" id="p2">
@@ -246,7 +241,6 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
     <div class="group-lbl" style="margin-top:0">Geçmiş Harcamalar</div>
     <div id="harcamaKutusu"></div>
     <div id="butceDeletedContainer"></div>
-    <div class="footer-sig">Tasarım &amp; Fikir: <strong>ysfykc</strong> • v1.0</div>
   </div>
 </main>
 
