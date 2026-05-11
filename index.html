@@ -80,15 +80,15 @@ main{padding-top:calc(var(--top) + 16px);padding-bottom:calc(var(--nav) + 20px)}
 .add-btn:active{transform:scale(.95)}
 
 .l-item{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--surf);border-radius:16px;margin-bottom:8px;box-shadow:var(--ios-shadow);border:.5px solid var(--brd)}
-.l-left{display:flex;align-items:center;gap:12px}
-.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--brd2);display:flex;align-items:center;justify-content:center;transition:.2s}
+.l-left{display:flex;align-items:center;gap:12px;flex:1;}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--brd2);display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
 .chk.on{background:var(--sec);border-color:var(--sec)}
 .chk.on::after{content:'✓';color:#fff;font-size:14px;font-weight:700}
 .l-name{font-size:15px;font-weight:600;color:var(--txt);transition:.2s}
 .l-name.done{text-decoration:line-through;color:var(--txt3)}
 .l-meta{font-size:10px;color:var(--txt3);margin-top:4px;display:flex;align-items:center;gap:4px}
 .l-who{background:var(--bg2);padding:2px 6px;border-radius:6px;font-weight:700}
-.del{color:var(--red);font-size:18px;padding:4px}
+.del{color:var(--red);font-size:18px;padding:4px 8px;flex-shrink:0}
 
 /* MODAL */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:900;display:none;align-items:flex-end}
@@ -109,7 +109,7 @@ main{padding-top:calc(var(--top) + 16px);padding-bottom:calc(var(--nav) + 20px)}
 <div id="login">
   <img src="ev-logo.png" class="login-bg">
   <div class="box">
-    <input type="text" id="evKodu" class="fam-code" placeholder="Eşinizle Ortak Bir Şifre/Kod Belirleyin">
+    <input type="text" id="evKodu" class="fam-code" placeholder="Eşinizle Ortak Bir Şifre Belirleyin">
     <button id="loginBtn" class="login-btn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
       Google ile Giriş Yap
@@ -179,7 +179,7 @@ const CFG = {
 let db, auth, user = null;
 let evKodu = localStorage.getItem('ev_kodu') || '';
 let veri = { limit: 0, liste: [], harcamalar: [] };
-let unsubscribe = null; // Canlı dinleyici
+let unsubscribe = null;
 
 async function initFb() {
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
@@ -233,7 +233,16 @@ function canliBaglantiKur() {
 
   unsubscribe = onSnapshot(docRef, (snap) => {
     if(snap.exists()) {
-      veri = JSON.parse(snap.data().json);
+      try {
+        const parsed = JSON.parse(snap.data().json || '{}');
+        veri = {
+          limit: parsed.limit || 0,
+          liste: parsed.liste || [],
+          harcamalar: parsed.harcamalar || []
+        };
+      } catch(e) {
+        veri = { limit: 0, liste: [], harcamalar: [] };
+      }
     } else {
       veri = { limit: 0, liste: [], harcamalar: [] };
     }
@@ -241,13 +250,19 @@ function canliBaglantiKur() {
   });
 }
 
-// Veriyi buluta tek tıkla yolla (Dinleyici anında ekranları günceller)
+// Veriyi buluta tek tıkla yolla
 async function veriyiGuncelle() {
   if(!user || !evKodu) return;
   const { doc, setDoc } = window._fb;
   document.getElementById('sync').textContent = '⏳ Yazılıyor';
-  await setDoc(doc(db, 'households', evKodu), { json: JSON.stringify(veri) });
-  document.getElementById('sync').textContent = '🟢 Senkronize';
+  try {
+    await setDoc(doc(db, 'households', evKodu), { json: JSON.stringify(veri) });
+    document.getElementById('sync').textContent = '🟢 Senkronize';
+  } catch(error) {
+    console.error("Firebase İzini Yok:", error);
+    document.getElementById('sync').textContent = '❌ İzin Hatası';
+    alert("Firebase veritabanı ayarlarında 'Rules' (Güvenlik) izni verilmediği için kaydedilemedi! Lütfen Firebase konsolundan kuralları güncelleyin.");
+  }
 }
 
 function userName() {
@@ -259,26 +274,30 @@ function uid() { return Date.now().toString(36); }
 
 /* --- İŞLEMLER --- */
 
-// ALIŞVERİŞ
 function urunEkle() {
   const ad = document.getElementById('yeniUrun').value.trim();
   if(!ad) return;
   veri.liste.push({ id: uid(), ad: ad, alindi: false, ekleyen: userName() });
   document.getElementById('yeniUrun').value = '';
+  render(); // Anında ekrana yansıt (Hızlı tepki)
   veriyiGuncelle();
 }
 
 function toggleAlindi(id) {
   const item = veri.liste.find(x => x.id === id);
-  if(item) { item.alindi = !item.alindi; veriyiGuncelle(); }
+  if(item) { 
+    item.alindi = !item.alindi; 
+    render();
+    veriyiGuncelle(); 
+  }
 }
 
 function urunSil(id) {
   veri.liste = veri.liste.filter(x => x.id !== id);
+  render();
   veriyiGuncelle();
 }
 
-// BÜTÇE
 function harcamaEkle() {
   const ad = document.getElementById('hAd').value.trim();
   const tutar = parseFloat(document.getElementById('hTutar').value);
@@ -286,11 +305,13 @@ function harcamaEkle() {
   veri.harcamalar.push({ id: uid(), ad: ad, tutar: tutar, ekleyen: userName(), tarih: new Date().toISOString() });
   document.getElementById('hAd').value = '';
   document.getElementById('hTutar').value = '';
+  render();
   veriyiGuncelle();
 }
 
 function harcamaSil(id) {
   veri.harcamalar = veri.harcamalar.filter(x => x.id !== id);
+  render();
   veriyiGuncelle();
 }
 
@@ -302,6 +323,7 @@ function modalAc(id) {
 function limitKaydet() {
   veri.limit = parseFloat(document.getElementById('yeniLimit').value) || 0;
   document.getElementById('mBakiye').classList.remove('on');
+  render();
   veriyiGuncelle();
 }
 
@@ -313,17 +335,17 @@ function render() {
     lKutu.innerHTML = '<div class="empty">Sepet boş. Evin eksiklerini buraya ekle.</div>';
   } else {
     // Alınmayanlar üstte, alınanlar altta
-    veri.liste.sort((a,b) => (a.alindi === b.alindi) ? 0 : a.alindi ? 1 : -1);
-    lKutu.innerHTML = veri.liste.map(x => `
+    const sirali = [...veri.liste].sort((a,b) => (a.alindi === b.alindi) ? 0 : a.alindi ? 1 : -1);
+    lKutu.innerHTML = sirali.map(x => `
       <div class="l-item">
-        <div class="l-left" onclick="toggleAlindi('${x.id}')">
+        <div class="l-left" onclick="toggleAlindi('${x.id}')" style="cursor:pointer">
           <div class="chk ${x.alindi ? 'on' : ''}"></div>
           <div>
             <div class="l-name ${x.alindi ? 'done' : ''}">${x.ad}</div>
             <div class="l-meta"><span class="l-who">${x.ekleyen}</span> ekledi</div>
           </div>
         </div>
-        <div class="del" onclick="urunSil('${x.id}')">🗑</div>
+        <div class="del" onclick="urunSil('${x.id}')" style="cursor:pointer">🗑</div>
       </div>
     `).join('');
   }
@@ -343,8 +365,8 @@ function render() {
   if(veri.harcamalar.length === 0) {
     hKutu.innerHTML = '<div class="empty">Henüz harcama eklenmedi.</div>';
   } else {
-    const sirali = [...veri.harcamalar].sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
-    hKutu.innerHTML = sirali.map(x => `
+    const siraliH = [...veri.harcamalar].sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
+    hKutu.innerHTML = siraliH.map(x => `
       <div class="l-item">
         <div class="l-left">
           <div class="chk on" style="border:none;background:rgba(0,0,0,.05);font-size:16px">💸</div>
@@ -355,7 +377,7 @@ function render() {
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <div style="font-weight:700;font-size:15px">₺${x.tutar.toLocaleString('tr-TR')}</div>
-          <div class="del" onclick="harcamaSil('${x.id}')">🗑</div>
+          <div class="del" onclick="harcamaSil('${x.id}')" style="cursor:pointer">🗑</div>
         </div>
       </div>
     `).join('');
