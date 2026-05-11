@@ -46,9 +46,15 @@ button,input{font-family:var(--fd);border:none;background:none;outline:none}
 }
 .login-bg { width: 100%; max-width: 320px; height: auto; object-fit: contain; margin-bottom: 24px; border-radius: 36px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
 .box { width: 100%; text-align: center; }
-.fam-code { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 16px; color: #fff; text-align: center; font-size: 16px; margin-bottom: 16px; font-weight: 600; letter-spacing: 1px;}
-.fam-code::placeholder { color: rgba(255,255,255,0.4); font-weight: 400; letter-spacing: normal;}
+.fam-code { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 16px; color: #fff; text-align: center; font-size: 18px; margin-bottom: 16px; font-weight: 700; letter-spacing: 2px;}
+.fam-code::placeholder { color: rgba(255,255,255,0.4); font-weight: 500; letter-spacing: normal; font-size: 14px;}
 .login-btn { width: 100%; padding: 14px; border-radius: 14px; background: #fff; color: #000; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+/* YENİ: KOD OLUŞTURMA ALANI */
+.gen-code-area { margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); }
+.gen-txt { color:rgba(255,255,255,0.6); font-size:12px; line-height:1.6; }
+.gen-btn { margin-top:8px; color:#ff6b6b; font-weight:700; font-size:13px; text-decoration:underline; cursor:pointer; }
+.gen-btn:active { opacity:0.7; }
 
 /* TOPBAR & NAV */
 .topbar{position:fixed;top:0;left:0;right:0;height:var(--top);background:var(--ios-blur);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:.5px solid var(--brd2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200}
@@ -73,7 +79,7 @@ main{padding-top:calc(var(--top) + 16px);padding-bottom:calc(var(--nav) + 20px)}
 .b-bar{height:100%;background:linear-gradient(90deg,var(--prim),var(--prim2));border-radius:99px;transition:width .4s}
 .b-info{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--txt2)}
 
-/* YENİ: KİŞİ BAZLI HARCAMA ÖZETİ */
+/* KİŞİ BAZLI HARCAMA ÖZETİ */
 .user-summary { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
 .u-row { display:flex; justify-content:space-between; align-items:center; background:var(--surf); box-shadow:var(--ios-shadow); border:.5px solid var(--brd); padding:12px 16px; border-radius:16px; }
 .u-name { font-size:13px; font-weight:700; color:var(--txt); display:flex; align-items:center; gap:10px;}
@@ -109,6 +115,10 @@ main{padding-top:calc(var(--top) + 16px);padding-bottom:calc(var(--nav) + 20px)}
 
 .empty{text-align:center;padding:40px 20px;color:var(--txt3);font-size:14px}
 #sync{font-size:14px;background:var(--bg2);padding:4px 8px;border-radius:99px;font-weight:600}
+
+/* BİLDİRİM (TOAST) STİLLERİ */
+.toast{position:fixed;bottom:calc(var(--nav) + 16px);left:50%;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:12px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s ease;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.3);white-space:nowrap;}
+.toast.on{opacity:1;transform:translate(-50%, -8px);}
 </style>
 </head>
 <body>
@@ -116,12 +126,17 @@ main{padding-top:calc(var(--top) + 16px);padding-bottom:calc(var(--nav) + 20px)}
 <div id="login">
   <img src="ev-logo.png" class="login-bg">
   <div class="box">
-    <input type="text" id="evKodu" class="fam-code" placeholder="Eşinizle Ortak Bir Şifre Belirleyin">
+    <input type="text" id="evKodu" class="fam-code" placeholder="Güvenli Aile Kodunuzu Girin">
     <button id="loginBtn" class="login-btn" onclick="girisYap()">
       <svg height="20" viewbox="0 0 24 24" width="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
       Google ile Giriş Yap
     </button>
-    <p style="color:rgba(255,255,255,0.6);font-size:11px;margin-top:16px;">Ortak kodunuzu giren herkes bu listeyi görebilir.<br>Lütfen tahmin edilmesi zor bir kod yazın.</p>
+    
+    <div class="gen-code-area">
+      <div class="gen-txt">Uygulamayı ilk kez mi kullanıyorsunuz?<br>Eşinizle ortak kullanmak için eşsiz bir kod oluşturun.</div>
+      <button class="gen-btn" onclick="guvenliKodOlustur()">Güvenli Kod Oluştur</button>
+    </div>
+
   </div>
 </div>
 
@@ -180,6 +195,8 @@ main{padding-top:calc(var(--top) + 16px);padding-bottom:calc(var(--nav) + 20px)}
   </div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
 const CFG = {
   apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',
@@ -191,6 +208,7 @@ let db, auth, user = null;
 let evKodu = localStorage.getItem('ev_kodu') || '';
 let veri = { limit: 0, liste: [], harcamalar: [] };
 let unsubscribe = null;
+let oncekiUrunSayisi = -1; 
 
 async function initFb() {
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
@@ -217,9 +235,21 @@ async function initFb() {
   });
 }
 
+/* YENİ: GÜVENLİ KOD OLUŞTURUCU */
+function guvenliKodOlustur() {
+  const karakterler = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let kod = '';
+  for(let i=0; i<8; i++) {
+    if(i === 4) kod += '-';
+    kod += karakterler.charAt(Math.floor(Math.random() * karakterler.length));
+  }
+  document.getElementById('evKodu').value = kod;
+  alert("Güvenli kodunuz oluşturuldu!\n\nKod: " + kod + "\n\nLütfen giriş yapmadan önce bu kodu kopyalayıp eşinize WhatsApp'tan gönderin.");
+}
+
 async function girisYap() {
-  const kod = document.getElementById('evKodu').value.trim().toLowerCase();
-  if(!kod) return alert("Lütfen ortak bir ev kodu girin!");
+  const kod = document.getElementById('evKodu').value.trim().toUpperCase();
+  if(!kod) return alert("Lütfen giriş yapmak için bir kod girin veya yeni kod oluşturun!");
   evKodu = kod;
   localStorage.setItem('ev_kodu', kod);
   
@@ -235,7 +265,7 @@ async function cikisYap() {
   window.location.reload();
 }
 
-// 🟢 CANLI BAĞLANTI (EŞZAMANLI SYNC)
+// 🟢 CANLI BAĞLANTI & BİLDİRİM SESİ
 function canliBaglantiKur() {
   const { doc, onSnapshot } = window._fb;
   const docRef = doc(db, 'households', evKodu);
@@ -251,6 +281,19 @@ function canliBaglantiKur() {
           liste: parsed.liste || [],
           harcamalar: parsed.harcamalar || []
         };
+
+        // BİLDİRİM VE SES SİSTEMİ
+        const guncelUrunSayisi = veri.liste.length;
+        if (oncekiUrunSayisi !== -1 && guncelUrunSayisi > oncekiUrunSayisi) {
+           const sonUrun = veri.liste[guncelUrunSayisi - 1];
+           // Ekleyen kişi biz değilsek bildirim ver
+           if (sonUrun && sonUrun.ekleyen !== userName()) {
+               showToast("🛒 " + sonUrun.ekleyen + " listeye yeni bir ürün ekledi!");
+               try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){}
+           }
+        }
+        oncekiUrunSayisi = guncelUrunSayisi;
+
       } catch(e) {
         veri = { limit: 0, liste: [], harcamalar: [] };
       }
@@ -290,7 +333,7 @@ function urunEkle() {
   if(!ad) return;
   veri.liste.push({ id: uid(), ad: ad, alindi: false, ekleyen: userName() });
   document.getElementById('yeniUrun').value = '';
-  render(); // Anında ekrana yansıt (Hızlı tepki)
+  render();
   veriyiGuncelle();
 }
 
@@ -338,6 +381,14 @@ function limitKaydet() {
   veriyiGuncelle();
 }
 
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 3500);
+}
+
 /* --- EKRAN ÇİZİMİ --- */
 function render() {
   // Liste
@@ -345,7 +396,6 @@ function render() {
   if(veri.liste.length === 0) {
     lKutu.innerHTML = '<div class="empty">Sepet boş. Evin eksiklerini buraya ekle.</div>';
   } else {
-    // Alınmayanlar üstte, alınanlar altta
     const sirali = [...veri.liste].sort((a,b) => (a.alindi === b.alindi) ? 0 : a.alindi ? 1 : -1);
     lKutu.innerHTML = sirali.map(x => `
       <div class="l-item">
@@ -372,7 +422,7 @@ function render() {
   document.getElementById('bBar').style.width = pct + '%';
   document.getElementById('bBar').style.background = pct > 90 ? 'var(--red)' : '';
 
-  // YENİ: KİŞİ BAZLI ÖZET (Kim Ne Harcadı)
+  // KİŞİ BAZLI ÖZET (Kim Ne Harcadı)
   const kisiMap = {};
   veri.harcamalar.forEach(x => {
     kisiMap[x.ekleyen] = (kisiMap[x.ekleyen] || 0) + x.tutar;
