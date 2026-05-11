@@ -71,6 +71,11 @@ input::placeholder {color: var(--txt3);}
 .gen-txt { color:rgba(255,255,255,0.5); font-size:12px; line-height:1.6; }
 .gen-btn { margin-top:10px; color:#ff453a; font-weight:700; font-size:14px; cursor:pointer; padding:8px 16px; background:rgba(255,69,58,0.1); border-radius:99px;}
 
+/* İMZA (LOGIN) */
+.login-badge { position:absolute; top:24px; right:24px; background:rgba(0,0,0,0.4); color:rgba(255,255,255,0.85); padding:6px 12px; border-radius:999px; font-size:10.5px; letter-spacing:0.02em; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:0.5px solid rgba(255,255,255,0.15); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+.login-badge strong { color:#fff; font-weight:700; }
+.version-tag { margin-top:24px; font-size:11px; color:rgba(255,255,255,0.3); font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+
 /* TOPBAR */
 .topbar { position:fixed; top:0; left:0; right:0; height:var(--top); background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border-bottom:.5px solid var(--brd); display:flex; align-items:center; justify-content:space-between; padding:0 20px; z-index:200; }
 .logo { font-family:var(--fs); font-size:24px; display:flex; align-items:center; gap:10px; letter-spacing:-0.5px; }
@@ -128,7 +133,7 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .u-amt { font-size:15px; font-weight:800; color:var(--txt); }
 .u-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, var(--prim), var(--prim2)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; box-shadow:var(--ios-shadow-sm);}
 
-/* SİLİNENLER BÖLÜMÜ (YENİ) */
+/* SİLİNENLER BÖLÜMÜ */
 .deleted-sec { margin-top:24px; background:var(--surf-solid); border:.5px dashed var(--brd); border-radius:24px; overflow:hidden; }
 .deleted-head { padding:16px 20px; display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:12px; color:var(--txt3); cursor:pointer; text-transform:uppercase; letter-spacing:1px;}
 .deleted-body { display:none; border-top:.5px solid var(--brd); padding:8px 20px 16px; }
@@ -142,6 +147,10 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 .d-btn { padding:8px 12px; border-radius:12px; font-size:11px; font-weight:800; background:var(--bg2); color:var(--txt); cursor:pointer;}
 .d-btn.red { color:var(--prim); }
 .d-btn:active { transform:scale(0.9); }
+
+/* UYGULAMA İÇİ İMZA (Alt Kısım) */
+.footer-sig { text-align:center; padding:32px 20px 20px; font-size:11px; color:var(--txt3); font-weight:600; letter-spacing:0.5px; }
+.footer-sig strong { color:var(--txt2); font-weight:800; }
 
 /* SABİT ALT EKLEME ÇUBUĞU */
 .fixed-add-bar { position:fixed; bottom:calc(var(--nav) + 16px); left:20px; right:20px; background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); padding:8px; border-radius:24px; box-shadow:0 16px 40px rgba(0,0,0,0.15); display:flex; gap:8px; border:.5px solid var(--brd); z-index:150; animation:fadeUp .3s; }
@@ -182,6 +191,8 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
 <body>
 
 <div id="login">
+  <div class="login-badge">Tasarım &amp; Fikir <strong>ysfykc</strong></div>
+  
   <img src="ev-logo.png" class="login-bg">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -193,6 +204,7 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
       <div class="gen-txt">İlk kez mi kullanıyorsunuz? Eşinizle ortak kullanmak için eşsiz bir kod oluşturun.</div>
       <button class="gen-btn" onclick="guvenliKodOlustur()">Yeni Kod Oluştur</button>
     </div>
+    <div class="version-tag">VERSİYON 1.0</div>
   </div>
 </div>
 
@@ -209,6 +221,7 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
   <div class="page on" id="p1">
     <div id="listeKutusu"></div>
     <div id="marketDeletedContainer"></div>
+    <div class="footer-sig">Tasarım &amp; Fikir: <strong>ysfykc</strong> • v1.0</div>
   </div>
 
   <div class="page" id="p2">
@@ -233,6 +246,7 @@ main { padding-top:calc(var(--top) + 20px); padding-bottom:calc(var(--nav) + 120
     <div class="group-lbl" style="margin-top:0">Geçmiş Harcamalar</div>
     <div id="harcamaKutusu"></div>
     <div id="butceDeletedContainer"></div>
+    <div class="footer-sig">Tasarım &amp; Fikir: <strong>ysfykc</strong> • v1.0</div>
   </div>
 </main>
 
@@ -276,14 +290,12 @@ let evKodu = localStorage.getItem('ev_kodu') || '';
 let veri = { aylar: {}, liste: [], silinenListe: [] };
 let unsubscribe = null;
 let oncekiUrunSayisi = -1; 
-let aktifAy = getPeriodId(); // Başlangıç periyodu (Örn: 2026-04)
+let aktifAy = getPeriodId(); 
 
-// 15'İNDEN 15'İNE PERİYOT HESAPLAYICI
 function getPeriodId(dStr) {
   const d = dStr ? new Date(dStr) : new Date();
   let y = d.getFullYear();
   let m = d.getMonth() + 1;
-  // Eğer ayın 15'inden küçükse, bir önceki ayın periyodudur.
   if (d.getDate() < 15) {
     m -= 1;
     if (m === 0) { m = 12; y -= 1; }
@@ -359,7 +371,6 @@ async function cikisYap() {
 
 function dataMigration(parsed) {
   let v = parsed;
-  // Eski tekli limit ve harcamalar yapısını yeni "aylar" (15'lik periyot) yapısına çevirme
   if (!v.aylar) {
     v.aylar = {};
     let mevcutLimit = v.limit || 0;
@@ -375,7 +386,6 @@ function dataMigration(parsed) {
   if (!v.liste) v.liste = [];
   if (!v.silinenListe) v.silinenListe = [];
 
-  // Aktif ay yoksa oluştur ve önceki aydan limiti devral
   if (!v.aylar[aktifAy]) {
     let prevLimit = 0;
     let keys = Object.keys(v.aylar).sort();
@@ -462,7 +472,7 @@ function urunGeriAl(id) {
   const idx = veri.silinenListe.findIndex(x => x.id === id);
   if(idx > -1) {
     const item = veri.silinenListe.splice(idx, 1)[0];
-    item.alindi = false; // Geri alınan ürün alınmamış olarak gelir
+    item.alindi = false; 
     veri.liste.push(item);
     render(); veriyiGuncelle(); showToast("↩️ Ürün geri alındı");
   }
@@ -477,9 +487,6 @@ function harcamaEkle() {
   const tutar = parseFloat(document.getElementById('hTutar').value);
   if(!ad || !tutar) return showToast("⚠️ Alanları doldurun");
   
-  // Harcama eklenirken o anki takvim günü geçerlidir, ancak şu an görüntülenen aya eklersek karmaşa olmaz. 
-  // En mantıklısı şu anki tarihe göre eklemek ama seçili aya yazdırmak. 
-  // (Not: Kullanıcı geçmiş aya harcama ekleyebilir mantığıyla)
   veri.aylar[aktifAy].harcamalar.push({ id: uid(), ad: ad, tutar: tutar, ekleyen: userName(), tarih: new Date().toISOString() });
   
   document.getElementById('hAd').value = '';
@@ -527,7 +534,6 @@ function ayDegis(delta) {
   if (m < 1) { m = 12; y--; }
   aktifAy = `${y}-${String(m).padStart(2, '0')}`;
   
-  // Eğer gidilen ay yoksa oluştur ve önceki limitten devral
   if (!veri.aylar[aktifAy]) {
     let prevLimit = 0;
     let keys = Object.keys(veri.aylar).sort();
@@ -590,9 +596,9 @@ function buildDeletedHtml(list, tip) {
 
 /* RENDER */
 function render() {
-  if(!veri.aylar) return; // Henüz yüklenmediyse bekle
+  if(!veri.aylar) return;
 
-  // MARKET LİSTESİ (Akıllı Gruplama)
+  // MARKET LİSTESİ
   const lKutu = document.getElementById('listeKutusu');
   if(veri.liste.length === 0) {
     lKutu.innerHTML = '<div class="empty"><div style="font-size:40px;margin-bottom:10px">🛒</div>Alınacak bir şey yok.<br>Aşağıdan ekleyebilirsiniz.</div>';
@@ -623,7 +629,7 @@ function render() {
   }
   document.getElementById('marketDeletedContainer').innerHTML = buildDeletedHtml(veri.silinenListe, 'urun');
 
-  // BÜTÇE EKRANI (SEÇİLİ AY)
+  // BÜTÇE EKRANI
   document.getElementById('ayIsimTxt').textContent = getPeriodName(aktifAy);
   const ayVeri = veri.aylar[aktifAy];
   
@@ -637,7 +643,7 @@ function render() {
   document.getElementById('bBar').style.width = pct + '%';
   document.getElementById('bBar').style.background = pct > 90 ? 'linear-gradient(90deg, var(--prim), #8b0000)' : '';
 
-  // KİM NE HARCADI (O AYA ÖZEL)
+  // KİM NE HARCADI
   const kMap = {};
   ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = (kMap[x.ekleyen] || 0) + x.tutar; });
   const kisiler = Object.entries(kMap).sort((a,b)=>b[1]-a[1]);
@@ -671,12 +677,12 @@ function render() {
   baglaSwipe();
 }
 
-/* SWIPE LOGIC (IOS STYLE) */
+/* SWIPE LOGIC */
 function baglaSwipe() {
   document.querySelectorAll('.swipe-content').forEach(el => {
     let sx=0, cx=0, swiping=false, moved=false;
     const id = el.dataset.id;
-    const tip = el.dataset.tip; // 'urun' veya 'harcama'
+    const tip = el.dataset.tip; 
     const bg = document.getElementById('sbg-'+id);
 
     el.addEventListener('touchstart', e => {
@@ -691,11 +697,9 @@ function baglaSwipe() {
       if(!moved && Math.abs(dx) > 10) moved = true;
       if(!moved) return;
       
-      // Harcamalar sağa kaydırılamaz (sadece sola çekip silinebilir)
       if(tip === 'harcama' && dx > 0) return;
 
       cx = dx;
-      // Direnç efekti
       if(cx > 100) cx = 100 + (cx-100)*0.2;
       if(cx < -100) cx = -100 + (cx+100)*0.2;
       
