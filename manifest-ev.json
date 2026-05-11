@@ -1,7 +1,6 @@
 {
   "name": "Ev Cüzdanı",
   "short_name": "Ev Cüzdanı",
-  "start_url": "./ev.html",
   "display": "standalone",
   "background_color": "#f7f5f0",
   "theme_color": "#f7f5f0",
