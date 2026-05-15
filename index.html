@@ -415,20 +415,24 @@ async function initFb() {
   
   document.getElementById('hTarih').valueAsDate = new Date();
 
-  // Klavye Smoothness Fix
-  if(window.visualViewport) {
-     window.visualViewport.addEventListener('resize', () => {
-        const diff = window.innerHeight - window.visualViewport.height;
-        const areas = document.querySelectorAll('.fixed-bottom-area');
-        if(diff > 50) { 
-           areas.forEach(el => el.style.bottom = (diff + 10) + 'px');
-           document.getElementById('mainNav').style.transform = 'translateY(100%)';
-        } else {
-           areas.forEach(el => el.style.bottom = 'calc(var(--nav) + 16px)');
-           document.getElementById('mainNav').style.transform = 'translateY(0)';
-        }
-     });
-  }
+  // Android/iOS Uyumlu Klavye Fix'i
+  let initialViewportHeight = window.innerHeight;
+  window.addEventListener('resize', () => {
+      const areas = document.querySelectorAll('.fixed-bottom-area');
+      // Eğer ekran boyutu %20'den fazla daraldıysa (klavye açılmıştır)
+      if(window.innerHeight < initialViewportHeight * 0.8) {
+          document.getElementById('mainNav').style.display = 'none'; // Alt menüyü gizle
+          document.querySelectorAll('.chips-container').forEach(c => c.style.display = 'none'); // Çipleri gizle
+          areas.forEach(el => el.style.bottom = '16px'); // Sadece 16px boşluk bırak, Android gerisini halleder
+      } else {
+          // Klavye kapandı
+          document.getElementById('mainNav').style.display = 'flex';
+          document.querySelectorAll('.chips-container').forEach(c => c.style.display = 'flex');
+          areas.forEach(el => el.style.bottom = 'calc(var(--nav) + 16px)');
+          // Cihaz yan çevrildiyse referans yüksekliği güncelle
+          initialViewportHeight = window.innerHeight;
+      }
+  });
 }
 
 function guvenliKodOlustur() {
