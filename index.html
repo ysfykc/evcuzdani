@@ -99,7 +99,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 
 .group-lbl { font-size:12px; font-weight:800; color:var(--txt3); text-transform:uppercase; letter-spacing:1px; margin:20px 0 8px 8px; }
 
-/* BASİT LİSTE ÖĞESİ (SWIPE YERİNE) */
+/* BASİT LİSTE ÖĞESİ */
 .list-item { background:var(--surf-solid); border-radius:16px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; box-shadow:var(--ios-shadow-sm); border:.5px solid var(--brd); transition:background .2s, transform .2s; user-select:none; -webkit-user-select:none; cursor:pointer;}
 .list-item:active { background:var(--bg2); transform:scale(0.98); }
 .l-info { display:flex; align-items:center; gap:10px; flex:1; min-width:0; pointer-events:none;}
@@ -198,6 +198,11 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .nbtn span { font-size:24px; transition:transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .nbtn.on span { transform:translateY(-2px); }
 
+/* --- KLAVYE AÇIK DURUMU (YENİ CSS) --- */
+body.kb-open .nav { display: none !important; }
+body.kb-open .chips-container { display: none !important; }
+body.kb-open .fixed-bottom-area { bottom: 16px !important; }
+
 /* MODAL / TOAST */
 .ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:900; display:none; align-items:center; justify-content:center; padding:20px;}
 .ov.on { display:flex; animation:fadeIn .2s; }
@@ -238,7 +243,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v1.3</div>
+  <div class="login-badge">v1.4</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -450,20 +455,19 @@ async function initFb() {
   
   document.getElementById('hTarih').valueAsDate = new Date();
 
-  // Android/iOS Uyumlu Klavye Fix'i
-  let initialViewportHeight = window.innerHeight;
-  window.addEventListener('resize', () => {
-      const areas = document.querySelectorAll('.fixed-bottom-area');
-      if(window.innerHeight < initialViewportHeight * 0.8) {
-          document.getElementById('mainNav').style.display = 'none'; 
-          document.querySelectorAll('.chips-container').forEach(c => c.style.display = 'none'); 
-          areas.forEach(el => el.style.bottom = '16px'); 
-      } else {
-          document.getElementById('mainNav').style.display = 'flex';
-          document.querySelectorAll('.chips-container').forEach(c => c.style.display = 'flex');
-          areas.forEach(el => el.style.bottom = 'calc(var(--nav) + 16px + env(safe-area-inset-bottom, 0px))');
-          initialViewportHeight = window.innerHeight;
-      }
+  // YENİ KLAVYE FIX (FOCUS/BLUR YÖNTEMİ)
+  const allInputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]');
+  allInputs.forEach(inp => {
+      inp.addEventListener('focus', () => {
+          document.body.classList.add('kb-open');
+      });
+      inp.addEventListener('blur', () => {
+          setTimeout(() => {
+              if (document.activeElement.tagName !== 'INPUT') {
+                  document.body.classList.remove('kb-open');
+              }
+          }, 50);
+      });
   });
 }
 
@@ -979,7 +983,7 @@ function render() {
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
   renderAsistan();
-  baglaLongPress(); // Uzun basım dinleyicilerini her renderda yeniden bağla
+  baglaLongPress(); 
 }
 
 function tab(n) { 
