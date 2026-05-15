@@ -81,10 +81,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.6; cursor: po
 .topbar { position:fixed; top:0; left:0; right:0; height:var(--top); background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border-bottom:.5px solid var(--brd); display:flex; align-items:center; justify-content:space-between; padding:0 20px; z-index:200; padding-top:env(safe-area-inset-top); box-sizing:content-box;}
 .logo { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-size:18px; font-weight:700; display:flex; align-items:center; gap:8px; letter-spacing:-0.5px; color:var(--txt);}
 .logo-img { width:24px; height:24px; border-radius:6px; box-shadow:var(--ios-shadow-sm); }
-.tbr { display:flex; align-items:center; gap:8px; }
+.tbr { display:flex; align-items:center; gap:10px; }
 .sync-badge { font-size:10px; background:var(--bg2); padding:5px 8px; border-radius:99px; font-weight:700; display:flex; align-items:center; gap:4px; text-transform:uppercase;}
 .sync-dot { width:6px; height:6px; background:var(--sec); border-radius:50%; }
-.ibtn { width:32px; height:32px; border-radius:50%; background:var(--bg2); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--txt); cursor:pointer; transition:.2s;}
+.ibtn { width:32px; height:32px; border-radius:50%; background:var(--bg2); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--txt); cursor:pointer;}
 .ibtn:active { transform:scale(0.9); }
 
 /* MAIN & PAGES */
@@ -214,7 +214,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .toast.on { opacity:1; transform:translate(-50%, 20px); }
 .h-amt { font-size:15px; font-weight:800; color:var(--txt); pointer-events:none;}
 
-/* ACTION SHEET (BASILI TUTUNCA AÇILAN MENÜ) */
+/* YENİ iOS ACTION SHEET (BASILI TUTUNCA AÇILAN MENÜ) */
 .action-sheet-ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:1000; display:flex; flex-direction:column; justify-content:flex-end; padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
 .action-sheet-ov.show { opacity:1; pointer-events:auto; }
 .action-sheet-wrap { transform:translateY(100%); transition:transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom:env(safe-area-inset-bottom, 0px); }
@@ -239,7 +239,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v3.0</div>
+  <div class="login-badge">v2.1</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -259,7 +259,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
   <div class="logo"><img class="logo-img" src="ev-logo.png" alt="Logo">Ev Cüzdanı</div>
   <div class="tbr">
     <div class="sync-badge" id="syncBadge"><div class="sync-dot"></div><span id="syncText">Bağlanıyor</span></div>
-    <button class="ibtn" id="notifBtn" onclick="bildirimIzniAl()" title="Bildirimleri Aç">🔔</button>
     <button class="ibtn" onclick="temaDegis()">🌓</button>
     <button class="ibtn" onclick="cikisYap()" style="background:var(--prim-bg); color:var(--prim);">⏏</button>
   </div>
@@ -267,6 +266,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 
 <main>
   <div class="page on" id="p1">
+    
     <div class="top-add-box">
       <div class="top-add-row">
         <button class="mic-btn" onclick="sesleYazdir('yeniUrun')">🎙</button>
@@ -281,6 +281,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
          <div class="chip" onclick="hizliEkle('Peçete', 'market')">🧻 Peçete</div>
       </div>
     </div>
+
     <div id="listeKutusu"></div>
     <div id="marketDeletedContainer"></div>
   </div>
@@ -393,13 +394,15 @@ const CFG = {
 
 let db, auth, user = null;
 let evKodu = localStorage.getItem('ev_kodu') || '';
-let veri = { aylar: {}, liste: [], silinenListe: [], tokens: {} };
+let veri = { aylar: {}, liste: [], silinenListe: [] };
 let unsubscribe = null;
 let oncekiUrunSayisi = -1; 
 let aktifAy = getPeriodId(); 
 let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
+
+// Uzun basım kontrol
 window.isLongPress = false;
 let selectedItemId = null;
 let selectedItemTip = null;
@@ -420,16 +423,21 @@ function getPeriodName(periodId) {
   return `15 ${AYLAR[m-1]} - 14 ${AYLAR[m2-1]}`;
 }
 
+// Akıllı Zaman Damgası Biçimlendirici (Bugün 14:30, Dün 09:15 vb.)
 function formatZaman(ms) {
   if(!ms) return '';
   const d = new Date(ms);
   const bugun = new Date();
   const dun = new Date(); dun.setDate(dun.getDate() - 1);
+  
   const isBugun = d.getDate() === bugun.getDate() && d.getMonth() === bugun.getMonth() && d.getFullYear() === bugun.getFullYear();
   const isDun = d.getDate() === dun.getDate() && d.getMonth() === dun.getMonth() && d.getFullYear() === dun.getFullYear();
+  
   const saat = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+  
   if(isBugun) return `Bugün ${saat}`;
   if(isDun) return `Dün ${saat}`;
+  
   const AYLAR = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
   return `${d.getDate()} ${AYLAR[d.getMonth()]} ${saat}`;
 }
@@ -438,12 +446,11 @@ async function initFb() {
   const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
   const { getFirestore, doc, setDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
   const { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-  const { getMessaging, getToken, onMessage } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js');
 
   const app = initializeApp(CFG);
   db = getFirestore(app);
   auth = getAuth(app);
-  window._fb = { app, doc, setDoc, onSnapshot, signInWithPopup, GoogleAuthProvider, signOut, getMessaging, getToken, onMessage };
+  window._fb = { doc, setDoc, onSnapshot, signInWithPopup, GoogleAuthProvider, signOut };
 
   onAuthStateChanged(auth, u => {
     user = u;
@@ -461,48 +468,26 @@ async function initFb() {
   document.getElementById('hAd').addEventListener('keypress', e => { if(e.key === 'Enter') document.getElementById('hTutar').focus(); });
   document.getElementById('hTarih').valueAsDate = new Date();
 
+  // KESİN VE KUSURSUZ KLAVYE ÇÖZÜMÜ: visualViewport ile ekran yüksekliğini dinliyoruz.
   const mainNav = document.getElementById('mainNav');
   if (window.visualViewport) {
       let initialHeight = window.visualViewport.height;
       window.visualViewport.addEventListener('resize', () => {
+          // Tarayıcı çubuğu gizlenip açıldığında da resize tetiklenir, bu yüzden farkı yüksek tutuyoruz (100px).
           if (window.visualViewport.height < initialHeight - 100) {
+              // Klavye açıldı
               mainNav.style.opacity = '0';
               mainNav.style.pointerEvents = 'none';
           } else {
+              // Klavye kapandı
               mainNav.style.opacity = '1';
               mainNav.style.pointerEvents = 'auto';
-              if (window.visualViewport.height > initialHeight) initialHeight = window.visualViewport.height;
+              // Eğer ekran boyutu büyüdüyse (örneğin URL çubuğu gizlendiyse) referansı güncelle
+              if (window.visualViewport.height > initialHeight) {
+                  initialHeight = window.visualViewport.height;
+              }
           }
       });
-  }
-}
-
-// BİLDİRİM İZNİ VE TOKEN ALMA
-async function bildirimIzniAl() {
-  if (!('Notification' in window)) return showToast("Tarayıcınız bildirim desteklemiyor.");
-  const permission = await Notification.requestPermission();
-  
-  if (permission === 'granted') {
-    const messaging = window._fb.getMessaging(window._fb.app);
-    try {
-      showToast("⏳ Anahtar alınıyor...");
-      // DİKKAT: Aşağıdaki VAPID anahtarını Firebase konsolundan alıp değiştirmelisin!
-      const token = await window._fb.getToken(messaging, { vapidKey: 'BGwtB-Pqa8DZwxn-RBcaRM2h3siZXpGNFxKtbNG4_mfb3NBCwP9yXsilwgmoynsueWy-Crl2Cyt8G1QDtl4SOvA' });
-      if(token) {
-         if(!veri.tokens) veri.tokens = {};
-         veri.tokens[userName()] = token;
-         veriyiGuncelle();
-         showToast("🔔 Bildirimler aktif!");
-         const nBtn = document.getElementById('notifBtn');
-         nBtn.style.color = 'var(--sec)';
-         nBtn.style.background = 'var(--sec-bg)';
-      }
-    } catch(e) {
-      console.error("Token hatası", e);
-      showToast("❌ Bildirim ayarlanamadı. VAPID Key eklediniz mi?");
-    }
-  } else {
-    showToast("⚠️ Bildirim izni reddedildi");
   }
 }
 
@@ -522,9 +507,10 @@ async function girisYap() {
   if(!kod) return showToast("⚠️ Lütfen bir kod girin");
   evKodu = kod;
   localStorage.setItem('ev_kodu', kod);
+  
   const { signInWithPopup, GoogleAuthProvider } = window._fb;
   document.getElementById('loginBtn').textContent = 'Bekleyin...';
-  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').innerHTML = 'Tekrar Dene'; }
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { console.log(e); document.getElementById('loginBtn').innerHTML = 'Tekrar Dene'; }
 }
 
 async function cikisYap() {
@@ -545,13 +531,14 @@ function dataMigration(parsed) {
       if (!v.aylar[pId]) v.aylar[pId] = { limit: mevcutLimit, harcamalar: [], silinenHarcamalar: [] };
       v.aylar[pId].harcamalar.push(h);
     });
-    v.silinenListe = []; delete v.harcamalar; delete v.limit;
+    v.silinenListe = [];
+    delete v.harcamalar; delete v.limit;
   }
   if (!v.liste) v.liste = [];
   if (!v.silinenListe) v.silinenListe = [];
-  if (!v.tokens) v.tokens = {};
   if (!v.aylar[aktifAy]) {
-    let prevLimit = 0; let keys = Object.keys(v.aylar).sort();
+    let prevLimit = 0;
+    let keys = Object.keys(v.aylar).sort();
     if(keys.length > 0) prevLimit = v.aylar[keys[keys.length-1]].limit;
     v.aylar[aktifAy] = { limit: prevLimit, harcamalar: [], silinenHarcamalar: [] };
   }
@@ -561,6 +548,7 @@ function dataMigration(parsed) {
 function canliBaglantiKur() {
   const { doc, onSnapshot } = window._fb;
   const docRef = doc(db, 'households', evKodu);
+  
   document.getElementById('syncText').textContent = 'Senkronize';
   document.querySelector('.sync-dot').style.background = 'var(--sec)';
 
@@ -569,7 +557,9 @@ function canliBaglantiKur() {
       try {
         const parsed = JSON.parse(snap.data().json || '{}');
         veri = dataMigration(parsed);
+        
         let sonGiris = parseInt(localStorage.getItem('ev_son_giris') || '0');
+
         if(isFirstLoad) {
            const partnerEkledikleri = veri.liste.filter(x => !x.alindi && x.ekleyen !== userName() && (x.eklemeTarihi || 0) > sonGiris);
            if(partnerEkledikleri.length > 0) {
@@ -592,6 +582,7 @@ function canliBaglantiKur() {
            oncekiUrunSayisi = gUrunS;
            localStorage.setItem('ev_son_giris', Date.now().toString());
         }
+
       } catch(e) { veri = dataMigration({}); }
     } else { veri = dataMigration({}); }
     render();
@@ -614,14 +605,21 @@ function userName() { return !user ? "Anonim" : (user.displayName ? user.display
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,4); }
 
 function hizliEkle(val, tip) {
-  if(tip === 'market') { document.getElementById('yeniUrun').value = val; document.getElementById('yeniUrun').focus(); } 
-  else { document.getElementById('hAd').value = val; document.getElementById('hTutar').focus(); }
+  if(tip === 'market') {
+     document.getElementById('yeniUrun').value = val;
+     document.getElementById('yeniUrun').focus();
+  } else {
+     document.getElementById('hAd').value = val;
+     document.getElementById('hTutar').focus();
+  }
 }
 
 function sesleYazdir(inputId) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition) return showToast("⚠️ Tarayıcınız sesle yazmayı desteklemiyor");
-  const rec = new SpeechRecognition(); rec.lang = 'tr-TR'; rec.start();
+  const rec = new SpeechRecognition();
+  rec.lang = 'tr-TR';
+  rec.start();
   showToast("🎙 Dinliyorum...");
   rec.onresult = (e) => {
      document.getElementById(inputId).value = e.results[0][0].transcript;
@@ -635,7 +633,8 @@ function urunEkle() {
   const ad = document.getElementById('yeniUrun').value.trim();
   if(!ad) return;
   veri.liste.push({ id: uid(), ad: ad, alindi: false, ekleyen: userName(), eklemeTarihi: Date.now() });
-  document.getElementById('yeniUrun').value = ''; document.getElementById('yeniUrun').blur(); 
+  document.getElementById('yeniUrun').value = '';
+  document.getElementById('yeniUrun').blur(); 
   render(); veriyiGuncelle();
 }
 
@@ -644,7 +643,12 @@ function toggleAlindi(id) {
   const item = veri.liste.find(x => x.id === id);
   if(item) { 
       item.alindi = !item.alindi; 
-      if(item.alindi) { item.alinmaTarihi = Date.now(); haptic(50); } else { haptic(30); }
+      if(item.alindi) {
+          item.alinmaTarihi = Date.now();
+          haptic(50); // Alındı olarak işaretlendiğinde hafif titreşim
+      } else {
+          haptic(30);
+      }
       render(); veriyiGuncelle(); 
   }
 }
@@ -658,7 +662,10 @@ function tumAlinanlariSil(e) {
   render(); veriyiGuncelle(); showToast("🗑 Tüm alınanlar silindi");
 }
 
-function toggleBoughtFolder(e) { if(e.target.closest('.clear-btn')) return; isBoughtOpen = !isBoughtOpen; render(); }
+function toggleBoughtFolder(e) {
+  if(e.target.closest('.clear-btn')) return;
+  isBoughtOpen = !isBoughtOpen; render();
+}
 
 function urunSil(id) {
   const idx = veri.liste.findIndex(x => x.id === id);
@@ -673,11 +680,15 @@ function urunGeriAl(id) {
   const idx = veri.silinenListe.findIndex(x => x.id === id);
   if(idx > -1) {
     const item = veri.silinenListe.splice(idx, 1)[0];
-    item.alindi = false; veri.liste.push(item);
+    item.alindi = false; 
+    veri.liste.push(item);
     render(); veriyiGuncelle(); showToast("↩️ Ürün geri alındı");
   }
 }
-function urunKaliciSil(id) { veri.silinenListe = veri.silinenListe.filter(x => x.id !== id); render(); veriyiGuncelle(); showToast("🗑 Kalıcı olarak silindi"); }
+function urunKaliciSil(id) {
+  veri.silinenListe = veri.silinenListe.filter(x => x.id !== id);
+  render(); veriyiGuncelle(); showToast("🗑 Kalıcı olarak silindi");
+}
 
 function harcamaEkle() {
   const ad = document.getElementById('hAd').value.trim();
@@ -710,16 +721,29 @@ function harcamaGeriAl(id) {
     render(); veriyiGuncelle(); showToast("↩️ Harcama geri alındı");
   }
 }
-function harcamaKaliciSil(id) { veri.aylar[aktifAy].silinenHarcamalar = veri.aylar[aktifAy].silinenHarcamalar.filter(x => x.id !== id); render(); veriyiGuncelle(); showToast("🗑 Kalıcı olarak silindi"); }
+function harcamaKaliciSil(id) {
+  veri.aylar[aktifAy].silinenHarcamalar = veri.aylar[aktifAy].silinenHarcamalar.filter(x => x.id !== id);
+  render(); veriyiGuncelle(); showToast("🗑 Kalıcı olarak silindi");
+}
 
-function modalAc(id) { document.getElementById(id).classList.add('on'); if(id === 'mBakiye') document.getElementById('yeniLimit').value = veri.aylar[aktifAy].limit || 0; }
+function modalAc(id) {
+  document.getElementById(id).classList.add('on');
+  if(id === 'mBakiye') document.getElementById('yeniLimit').value = veri.aylar[aktifAy].limit || 0;
+}
 
-function limitKaydet() { veri.aylar[aktifAy].limit = parseFloat(document.getElementById('yeniLimit').value) || 0; document.getElementById('mBakiye').classList.remove('on'); render(); veriyiGuncelle(); }
+function limitKaydet() {
+  veri.aylar[aktifAy].limit = parseFloat(document.getElementById('yeniLimit').value) || 0;
+  document.getElementById('mBakiye').classList.remove('on');
+  render(); veriyiGuncelle();
+}
 
 function ayDegis(delta) {
   let [y, m] = aktifAy.split('-').map(Number);
-  m += delta; if (m > 12) { m = 1; y++; } if (m < 1) { m = 12; y--; }
+  m += delta;
+  if (m > 12) { m = 1; y++; }
+  if (m < 1) { m = 12; y--; }
   aktifAy = `${y}-${String(m).padStart(2, '0')}`;
+  
   if (!veri.aylar[aktifAy]) {
     let prevLimit = 0; let keys = Object.keys(veri.aylar).sort();
     if(keys.length > 0) prevLimit = veri.aylar[keys[keys.length-1]].limit;
@@ -728,112 +752,220 @@ function ayDegis(delta) {
   } else { render(); }
 }
 
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 3000); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 3000);
+}
 
-function openActionSheet(id, tip) { selectedItemId = id; selectedItemTip = tip; document.getElementById('actionSheet').classList.add('show'); }
-function kapatActionSheet() { document.getElementById('actionSheet').classList.remove('show'); }
-function actionSil() { kapatActionSheet(); if(selectedItemTip === 'urun') urunSil(selectedItemId); else harcamaSil(selectedItemId); }
+/* ACTION SHEET & DÜZENLEME */
+function openActionSheet(id, tip) {
+  selectedItemId = id; selectedItemTip = tip;
+  document.getElementById('actionSheet').classList.add('show');
+}
+
+function kapatActionSheet() {
+  document.getElementById('actionSheet').classList.remove('show');
+}
+
+function actionSil() {
+  kapatActionSheet();
+  if(selectedItemTip === 'urun') urunSil(selectedItemId);
+  else harcamaSil(selectedItemId);
+}
+
 function actionDuzenle() {
-  kapatActionSheet(); const mEdit = document.getElementById('mEdit'); const bAlanlari = document.getElementById('editButceAlanlari');
+  kapatActionSheet();
+  const mEdit = document.getElementById('mEdit');
+  const bAlanlari = document.getElementById('editButceAlanlari');
+  
   if(selectedItemTip === 'urun') {
      const item = veri.liste.find(x => x.id === selectedItemId);
-     if(item) { document.getElementById('editAd').value = item.ad; bAlanlari.style.display = 'none'; }
+     if(item) {
+       document.getElementById('editAd').value = item.ad;
+       bAlanlari.style.display = 'none';
+     }
   } else {
      const item = veri.aylar[aktifAy].harcamalar.find(x => x.id === selectedItemId);
      if(item) {
-       document.getElementById('editAd').value = item.ad; document.getElementById('editTutar').value = item.tutar;
-       document.getElementById('editTarih').value = item.tarih.split('T')[0]; bAlanlari.style.display = 'block';
+       document.getElementById('editAd').value = item.ad;
+       document.getElementById('editTutar').value = item.tutar;
+       document.getElementById('editTarih').value = item.tarih.split('T')[0];
+       bAlanlari.style.display = 'block';
      }
   }
   mEdit.classList.add('on');
 }
+
 function kaydetEdit() {
   const ad = document.getElementById('editAd').value.trim();
   if(!ad) return;
+
   if(selectedItemTip === 'urun') {
-     const item = veri.liste.find(x => x.id === selectedItemId); if(item) item.ad = ad;
+     const item = veri.liste.find(x => x.id === selectedItemId);
+     if(item) item.ad = ad;
   } else {
      const tutar = parseFloat(document.getElementById('editTutar').value);
      const tarihInp = document.getElementById('editTarih').value;
      if(!tutar) return showToast("Tutar girmelisiniz");
+     
      const item = veri.aylar[aktifAy].harcamalar.find(x => x.id === selectedItemId);
      if(item) {
         item.ad = ad; item.tutar = tutar;
         if(tarihInp) {
-           const p = tarihInp.split('-'); const eskiSaat = new Date(item.tarih);
+           const p = tarihInp.split('-');
+           const eskiSaat = new Date(item.tarih);
            item.tarih = new Date(p[0], p[1]-1, p[2], eskiSaat.getHours(), eskiSaat.getMinutes()).toISOString();
         }
      }
   }
-  document.getElementById('mEdit').classList.remove('on'); render(); veriyiGuncelle(); showToast("✅ Güncellendi");
+  document.getElementById('mEdit').classList.remove('on');
+  render(); veriyiGuncelle(); showToast("✅ Güncellendi");
 }
 
 function baglaLongPress() {
   document.querySelectorAll('.list-item').forEach(el => {
-    let pressTimer; el.addEventListener('contextmenu', e => e.preventDefault());
-    const start = (e) => { window.isLongPress = false; pressTimer = setTimeout(() => { window.isLongPress = true; haptic(); openActionSheet(el.dataset.id, el.dataset.tip); }, 500); };
+    let pressTimer;
+    el.addEventListener('contextmenu', e => e.preventDefault());
+    
+    const start = (e) => {
+      window.isLongPress = false;
+      pressTimer = setTimeout(() => {
+        window.isLongPress = true;
+        haptic();
+        openActionSheet(el.dataset.id, el.dataset.tip);
+      }, 500);
+    };
     const cancel = () => clearTimeout(pressTimer);
-    el.addEventListener('touchstart', start, {passive: true}); el.addEventListener('touchend', cancel); el.addEventListener('touchmove', cancel);
-    el.addEventListener('mousedown', start); el.addEventListener('mouseup', cancel); el.addEventListener('mouseleave', cancel);
+    
+    el.addEventListener('touchstart', start, {passive: true});
+    el.addEventListener('touchend', cancel);
+    el.addEventListener('touchmove', cancel);
+    el.addEventListener('mousedown', start);
+    el.addEventListener('mouseup', cancel);
+    el.addEventListener('mouseleave', cancel);
   });
 }
 
 function haptic(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
 
+/* YZ ASİSTAN */
 function asistanTavsiyeleri() {
-  const v = veri.aylar[aktifAy]; const lim = v.limit || 0; const harcamalar = v.harcamalar || [];
-  const harcanan = harcamalar.reduce((s, x) => s + x.tutar, 0); const pct = lim ? (harcanan / lim) * 100 : 0; const kalan = lim - harcanan;
+  const v = veri.aylar[aktifAy];
+  const lim = v.limit || 0;
+  const harcamalar = v.harcamalar || [];
+  const harcanan = harcamalar.reduce((s, x) => s + x.tutar, 0);
+  const pct = lim ? (harcanan / lim) * 100 : 0;
+  const kalan = lim - harcanan;
+  
   const liste = [];
   if(lim === 0 && harcamalar.length === 0) return [{tag:"HOŞ GELDİNİZ", txt:"Aylık bütçe limitinizi belirleyip ilk harcamanızı girerek asistanı uyandırın."}];
   if(lim > 0 && harcamalar.length === 0) liste.push({tag:"PLANLAMA", txt:"Bütçe limitiniz hazır. Harcamalarınızı ekledikçe size özel tasarruf tavsiyeleri üreteceğim."});
   if(pct > 90) liste.push({tag:"KRİTİK SEVİYE", txt:`Bütçenizin %${Math.round(pct)}'sini tükettiniz. Kalan ${kalan.toLocaleString('tr-TR')} TL ile dönemi kapatmak için dikkatli harcama yapın.`});
   else if(pct > 75) liste.push({tag:"DİKKAT", txt:"Bütçe limitinizin büyük kısmı kullanıldı. Kalan günlerde büyük harcamaları ertelemek faydalı olabilir."});
   else if(pct < 40 && harcamalar.length > 4) liste.push({tag:"HARİKA GİDİŞAT", txt:"Bütçe yönetiminiz şu an mükemmel ilerliyor. Bu disiplinle ay sonunda ciddi tasarruf edebilirsiniz."});
+  
   if(harcamalar.length > 2) {
-     const kGrup = {}; harcamalar.forEach(h => { const kelime = h.ad.split(' ')[0].toUpperCase(); if(kelime.length > 2) kGrup[kelime] = (kGrup[kelime] || 0) + h.tutar; });
+     const kGrup = {};
+     harcamalar.forEach(h => {
+        const kelime = h.ad.split(' ')[0].toUpperCase();
+        if(kelime.length > 2) kGrup[kelime] = (kGrup[kelime] || 0) + h.tutar;
+     });
      const enBuyuk = Object.entries(kGrup).sort((a,b)=>b[1]-a[1])[0];
-     if(enBuyuk && enBuyuk[1] > (lim * 0.15) && lim > 0) liste.push({tag:"HARCAMA ANALİZİ", txt:`Bu dönem "${enBuyuk[0]}" harcamaları bütçenizin önemli bir kısmını (${enBuyuk[1].toLocaleString('tr-TR')} TL) oluşturuyor.`});
+     if(enBuyuk && enBuyuk[1] > (lim * 0.15) && lim > 0) {
+        liste.push({tag:"HARCAMA ANALİZİ", txt:`Bu dönem "${enBuyuk[0]}" harcamaları bütçenizin önemli bir kısmını (${enBuyuk[1].toLocaleString('tr-TR')} TL) oluşturuyor.`});
+     }
   }
-  const km = {}; harcamalar.forEach(x => { km[x.ekleyen] = (km[x.ekleyen] || 0) + x.tutar; }); const kArr = Object.keys(km);
+
+  const km = {}; harcamalar.forEach(x => { km[x.ekleyen] = (km[x.ekleyen] || 0) + x.tutar; });
+  const kArr = Object.keys(km);
   if(kArr.length > 1) liste.push({tag:"TAKIM İŞİ", txt:`${kArr.join(' ve ')} bütçeye birlikte yön veriyor. Ortak finansal takip, ev ekonomisinin en büyük gücüdür!`});
+  
   const marketKalan = veri.liste.filter(x => !x.alindi).length;
-  if(marketKalan > 4 && kalan < (lim * 0.2) && lim > 0) liste.push({tag:"MARKET UYARISI", txt:`Market listenizde alınmayı bekleyen ${marketKalan} ürün var ancak bütçeniz epey azalmış.`});
+  if(marketKalan > 4 && kalan < (lim * 0.2) && lim > 0) {
+     liste.push({tag:"MARKET UYARISI", txt:`Market listenizde alınmayı bekleyen ${marketKalan} ürün var ancak bütçeniz epey azalmış.`});
+  }
+
   if(liste.length === 0) liste.push({tag:"GÖZLEM", txt:"Harcama verileriniz dengeli görünüyor. Siz harcamalarınızı girdikçe analiz etmeye devam edeceğim."});
   return liste;
 }
 
 function renderAsistan() {
-  const c = document.getElementById('aiCard'); if(!veri.aylar || !veri.aylar[aktifAy]) { c.style.display='none'; return; }
+  const c = document.getElementById('aiCard');
+  if(!veri.aylar || !veri.aylar[aktifAy]) { c.style.display='none'; return; }
   const list = asistanTavsiyeleri();
-  if(list.length > 0) { c.style.display = 'block'; const s = list[asistanIndex % list.length]; document.getElementById('aiTag').textContent = s.tag; document.getElementById('aiTxt').textContent = s.txt; } 
-  else { c.style.display = 'none'; }
+  if(list.length > 0) {
+    c.style.display = 'block';
+    const s = list[asistanIndex % list.length];
+    document.getElementById('aiTag').textContent = s.tag;
+    document.getElementById('aiTxt').textContent = s.txt;
+  } else { c.style.display = 'none'; }
 }
 
 function akilliOneriYenile() { asistanIndex++; renderAsistan(); }
 
-function createListItem(id, htmlContent, tip, clickFn = "") { return `<div class="list-item" data-id="${id}" data-tip="${tip}" ${clickFn ? `onclick="${clickFn}"` : ''}>${htmlContent}</div>`; }
+function createListItem(id, htmlContent, tip, clickFn = "") {
+  return `
+    <div class="list-item" data-id="${id}" data-tip="${tip}" ${clickFn ? `onclick="${clickFn}"` : ''}>
+      ${htmlContent}
+    </div>`;
+}
 
 function buildDeletedHtml(list, tip) {
   if(!list || list.length === 0) return '';
-  return `<div class="deleted-sec"><div class="deleted-head" onclick="this.nextElementSibling.classList.toggle('on')"><span>🗑 Son Silinenler (${list.length})</span> <span>Gör ▼</span></div><div class="deleted-body">${list.map(x => `<div class="d-item"><div class="d-info"><div class="d-name">${x.ad} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div><div class="d-meta">${x.ekleyen} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div></div><div class="d-actions"><button class="d-btn" onclick="${tip==='harcama' ? 'harcamaGeriAl' : 'urunGeriAl'}('${x.id}')">Geri Al</button><button class="d-btn red" onclick="${tip==='harcama' ? 'harcamaKaliciSil' : 'urunKaliciSil'}('${x.id}')">Sil</button></div></div>`).join('')}</div></div>`;
+  return `
+    <div class="deleted-sec">
+      <div class="deleted-head" onclick="this.nextElementSibling.classList.toggle('on')">
+        <span>🗑 Son Silinenler (${list.length})</span> <span>Gör ▼</span>
+      </div>
+      <div class="deleted-body">
+        ${list.map(x => `
+          <div class="d-item">
+            <div class="d-info"><div class="d-name">${x.ad} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div><div class="d-meta">${x.ekleyen} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div></div>
+            <div class="d-actions">
+              <button class="d-btn" onclick="${tip==='harcama' ? 'harcamaGeriAl' : 'urunGeriAl'}('${x.id}')">Geri Al</button>
+              <button class="d-btn red" onclick="${tip==='harcama' ? 'harcamaKaliciSil' : 'urunKaliciSil'}('${x.id}')">Sil</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
 }
 
 function render() {
   if(!veri.aylar) return;
-  const nBtn = document.getElementById('notifBtn');
-  if(veri.tokens && veri.tokens[userName()]) { nBtn.style.color = 'var(--sec)'; nBtn.style.background = 'var(--sec-bg)'; } 
-  else { nBtn.style.color = 'var(--txt)'; nBtn.style.background = 'var(--bg2)'; }
 
   const lKutu = document.getElementById('listeKutusu');
-  if(veri.liste.length === 0) { lKutu.innerHTML = '<div class="empty"><div style="font-size:48px;margin-bottom:12px">🛒</div>Şu an alınacak bir şey yok.<br>Aşağıdan listeye ekleyebilirsiniz.</div>'; } 
-  else {
-    const alinacaklar = veri.liste.filter(x => !x.alindi); const alinanlar = veri.liste.filter(x => x.alindi); let html = '';
+  if(veri.liste.length === 0) {
+    lKutu.innerHTML = '<div class="empty"><div style="font-size:48px;margin-bottom:12px">🛒</div>Şu an alınacak bir şey yok.<br>Aşağıdan listeye ekleyebilirsiniz.</div>';
+  } else {
+    const alinacaklar = veri.liste.filter(x => !x.alindi);
+    const alinanlar = veri.liste.filter(x => x.alindi);
+    let html = '';
+    
+    // ALINACAKLAR RENDER
     if(alinacaklar.length > 0) {
       html += '<div class="group-lbl">Alınacaklar</div>';
-      html += alinacaklar.map(x => createListItem(x.id, `<div class="l-info"><div class="chk"></div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span>${formatZaman(x.eklemeTarihi)}</span></div></div></div>`, 'urun', `toggleAlindi('${x.id}')`)).join('');
+      html += alinacaklar.map(x => createListItem(x.id, `
+        <div class="l-info"><div class="chk"></div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span>${formatZaman(x.eklemeTarihi)}</span></div></div></div>
+      `, 'urun', `toggleAlindi('${x.id}')`)).join('');
     }
+    
+    // ALINANLAR RENDER
     if(alinanlar.length > 0) {
-      html += `<div class="bought-sec ${isBoughtOpen ? 'open' : ''}"><div class="bought-head" onclick="toggleBoughtFolder(event)"><div class="bought-title"><span class="chevron">▼</span> Alınanlar (${alinanlar.length})</div><button class="clear-btn" onclick="tumAlinanlariSil(event)">Tümünü Sil</button></div><div class="bought-body">${alinanlar.map(x => createListItem(x.id, `<div class="l-info"><div class="chk on"></div><div class="l-texts"><div class="l-name done">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span style="color:var(--sec); font-weight:700;">✓ ${formatZaman(x.alinmaTarihi || x.eklemeTarihi)}</span></div></div></div>`, 'urun', `toggleAlindi('${x.id}')`)).join('')}</div></div>`;
+      html += `
+        <div class="bought-sec ${isBoughtOpen ? 'open' : ''}">
+          <div class="bought-head" onclick="toggleBoughtFolder(event)">
+            <div class="bought-title"><span class="chevron">▼</span> Alınanlar (${alinanlar.length})</div>
+            <button class="clear-btn" onclick="tumAlinanlariSil(event)">Tümünü Sil</button>
+          </div>
+          <div class="bought-body">
+            ${alinanlar.map(x => createListItem(x.id, `
+              <div class="l-info"><div class="chk on"></div><div class="l-texts"><div class="l-name done">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span style="color:var(--sec); font-weight:700;">✓ ${formatZaman(x.alinmaTarihi || x.eklemeTarihi)}</span></div></div></div>
+            `, 'urun', `toggleAlindi('${x.id}')`)).join('')}
+          </div>
+        </div>
+      `;
     }
     lKutu.innerHTML = html;
   }
@@ -841,28 +973,52 @@ function render() {
 
   document.getElementById('ayIsimTxt').textContent = getPeriodName(aktifAy);
   const ayVeri = veri.aylar[aktifAy];
-  const harcanan = ayVeri.harcamalar.reduce((s, x) => s + x.tutar, 0); const kalan = (ayVeri.limit || 0) - harcanan;
-  let pct = ayVeri.limit ? (harcanan / ayVeri.limit) * 100 : 0; if(pct > 100) pct = 100;
-  document.getElementById('bKalan').textContent = `₺${kalan.toLocaleString('tr-TR')}`; document.getElementById('bHarcandi').textContent = `₺${harcanan.toLocaleString('tr-TR')} Harcandı`; document.getElementById('bLimit').textContent = `Limit: ₺${(ayVeri.limit||0).toLocaleString('tr-TR')}`;
-  const ringColor = pct > 90 ? 'var(--prim)' : 'var(--sec)'; document.getElementById('budgetRing').style.background = `conic-gradient(${ringColor} ${pct}%, var(--bg2) 0%)`; document.getElementById('budgetRingVal').textContent = `%${Math.round(pct)}`;
+  
+  const harcanan = ayVeri.harcamalar.reduce((s, x) => s + x.tutar, 0);
+  const kalan = (ayVeri.limit || 0) - harcanan;
+  let pct = ayVeri.limit ? (harcanan / ayVeri.limit) * 100 : 0;
+  if(pct > 100) pct = 100;
 
-  const kMap = {}; ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = (kMap[x.ekleyen] || 0) + x.tutar; });
-  const kisiler = Object.entries(kMap).sort((a,b)=>b[1]-a[1]); const kKutu = document.getElementById('kimNeHarcadiKutu');
-  if(kisiler.length > 0) { kKutu.style.display = 'block'; document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `<div class="u-row"><div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>`).join(''); } 
-  else { kKutu.style.display = 'none'; }
+  document.getElementById('bKalan').textContent = `₺${kalan.toLocaleString('tr-TR')}`;
+  document.getElementById('bHarcandi').textContent = `₺${harcanan.toLocaleString('tr-TR')} Harcandı`;
+  document.getElementById('bLimit').textContent = `Limit: ₺${(ayVeri.limit||0).toLocaleString('tr-TR')}`;
+  
+  const ringColor = pct > 90 ? 'var(--prim)' : 'var(--sec)';
+  document.getElementById('budgetRing').style.background = `conic-gradient(${ringColor} ${pct}%, var(--bg2) 0%)`;
+  document.getElementById('budgetRingVal').textContent = `%${Math.round(pct)}`;
+
+  const kMap = {};
+  ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = (kMap[x.ekleyen] || 0) + x.tutar; });
+  const kisiler = Object.entries(kMap).sort((a,b)=>b[1]-a[1]);
+  const kKutu = document.getElementById('kimNeHarcadiKutu');
+  if(kisiler.length > 0) {
+    kKutu.style.display = 'block';
+    document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `
+      <div class="u-row"><div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>
+    `).join('');
+  } else { kKutu.style.display = 'none'; }
 
   const hKutu = document.getElementById('harcamaKutusu');
-  if(ayVeri.harcamalar.length === 0) { hKutu.innerHTML = '<div class="empty">Bu periyotta harcama yok.</div>'; } 
-  else {
+  if(ayVeri.harcamalar.length === 0) {
+    hKutu.innerHTML = '<div class="empty">Bu periyotta harcama yok.</div>';
+  } else {
     const siraliH = [...ayVeri.harcamalar].sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
-    hKutu.innerHTML = siraliH.map(x => createListItem(x.id, `<div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${formatZaman(new Date(x.tarih).getTime())}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>`, 'harcama')).join('');
+    hKutu.innerHTML = siraliH.map(x => createListItem(x.id, `
+      <div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${formatZaman(new Date(x.tarih).getTime())}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>
+    `, 'harcama')).join('');
   }
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
-  renderAsistan(); baglaLongPress(); 
+  renderAsistan();
+  baglaLongPress(); 
 }
 
-function tab(n) { document.querySelectorAll('.page').forEach((e, i) => e.classList.toggle('on', i+1 === n)); document.querySelectorAll('.nbtn').forEach((e, i) => e.classList.toggle('on', i+1 === n)); document.getElementById('hTarih').valueAsDate = new Date(); window.scrollTo({top: 0, behavior: 'smooth'}); }
+function tab(n) { 
+  document.querySelectorAll('.page').forEach((e, i) => e.classList.toggle('on', i+1 === n)); 
+  document.querySelectorAll('.nbtn').forEach((e, i) => e.classList.toggle('on', i+1 === n)); 
+  document.getElementById('hTarih').valueAsDate = new Date();
+  window.scrollTo({top: 0, behavior: 'smooth'}); 
+}
 function temaDegis(forceDark=false) { const isDark = forceDark || document.documentElement.dataset.theme === 'light'; document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; document.getElementById('themeColorMeta').content = isDark ? '#000000' : '#f2f2f7'; localStorage.setItem('evTema', isDark ? 'dark' : 'light'); }
 document.addEventListener('DOMContentLoaded', initFb);
 </script>
