@@ -92,7 +92,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.6; cursor: po
 .ay-name { font-weight:800; font-size:12.5px; color:var(--txt); letter-spacing:-0.2px; text-transform:uppercase;}
 
 /* MAIN & PAGES */
-main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-bottom:calc(var(--nav) + 150px); }
+main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-bottom:calc(var(--nav) + 100px); }
 .page { display:none; padding:0 16px; }
 .page.on { display:block; animation:fade .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes fade { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -167,20 +167,20 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .d-btn.red { color:var(--prim); }
 .d-btn:active { transform:scale(0.9); }
 
-/* ALT EKLEME ALANLARI */
-.fixed-bottom-area { position:fixed; bottom:calc(var(--nav) + 16px + env(safe-area-inset-bottom, 0px)); left:16px; right:16px; z-index:150; display:flex; flex-direction:column; gap:6px; transition:bottom .2s ease-out; }
-.chips-container { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
-.chips-container::-webkit-scrollbar { display:none; }
-.chip { background:var(--surf-solid); border:1px solid var(--brd); color:var(--txt); padding:8px 14px; border-radius:99px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:.2s; box-shadow:var(--ios-shadow-sm); }
-.chip:active { transform:scale(0.95); background:var(--bg2);}
-.fixed-add-bar { background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); padding:8px; border-radius:24px; box-shadow:0 12px 32px rgba(0,0,0,0.12); display:flex; gap:8px; border:1px solid var(--brd); align-items:center; }
-.fixed-add-bar input[type="text"], .fixed-add-bar input[type="number"] { flex:1; background:var(--bg); border-radius:16px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--txt); min-width:0; }
+/* SABİT ALT EKLEME ÇUBUĞU */
+.fixed-add-bar { position:fixed; bottom:calc(var(--nav) + 16px); left:16px; right:16px; background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); padding:8px; border-radius:24px; box-shadow:0 12px 32px rgba(0,0,0,0.12); display:flex; gap:8px; border:1px solid var(--brd); z-index:150; transition:bottom 0.2s ease-out; }
+.fixed-add-bar input { flex:1; background:var(--bg); border-radius:16px; padding:12px 16px; font-size:14px; font-weight:500; color:var(--txt); min-width:0; }
 .add-btn { width:44px; height:44px; border-radius:16px; background:var(--prim); color:#fff; font-size:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; cursor:pointer;}
 .add-btn:active { transform:scale(0.9); }
-.mic-btn { width:44px; height:44px; border-radius:16px; background:var(--bg2); color:var(--txt); font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; cursor:pointer;}
-.mic-btn:active { transform:scale(0.9); }
-.h-inputs { display:flex; flex-direction:column; gap:6px; flex:1; min-width:0;}
-.h-row { display:flex; gap:6px; }
+.h-inputs { display:flex; gap:8px; flex:1; }
+.h-inputs input { width:50%; }
+
+/* YENİ iOS TARZI ALT MENÜ (BOTTOM NAV) */
+.nav { position:fixed; bottom:0; left:0; right:0; height:calc(var(--nav) + env(safe-area-inset-bottom, 0px)); padding-bottom:env(safe-area-inset-bottom, 0px); background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border-top:.5px solid var(--brd); display:flex; z-index:200; transition:transform .3s; }
+.nbtn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:10.5px; font-weight:700; color:var(--txt3); transition:all .3s ease; cursor:pointer; filter:grayscale(100%) opacity(50%); padding-top:6px;}
+.nbtn.on { filter:none; opacity:1; color:var(--prim); transform:scale(1.05); }
+.nbtn span { font-size:24px; transition:transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.nbtn.on span { transform:translateY(-2px); }
 
 /* WELCOME POPUP */
 .welcome-popup { position:fixed; top:-120px; left:16px; right:16px; background:var(--surf-solid); box-shadow:0 16px 40px rgba(0,0,0,0.2); border-radius:20px; padding:16px; z-index:9999; display:flex; align-items:center; gap:12px; transition:top .5s cubic-bezier(0.2, 0.8, 0.2, 1); border:1px solid var(--brd); }
@@ -190,18 +190,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .wp-title { font-weight:800; font-size:13.5px; color:var(--txt); }
 .wp-desc { font-weight:500; font-size:11.5px; color:var(--txt2); line-height:1.3; }
 .wp-close { width:30px; height:30px; background:var(--bg2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:var(--txt); cursor:pointer; flex-shrink:0;}
-
-/* YENİ iOS TARZI ALT MENÜ (BOTTOM NAV) */
-.nav { position:fixed; bottom:0; left:0; right:0; height:calc(var(--nav) + env(safe-area-inset-bottom, 0px)); padding-bottom:env(safe-area-inset-bottom, 0px); background:var(--surf); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border-top:.5px solid var(--brd); display:flex; z-index:200; transition:transform .3s; }
-.nbtn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:10.5px; font-weight:700; color:var(--txt3); transition:all .3s ease; cursor:pointer; filter:grayscale(100%) opacity(50%); padding-top:6px;}
-.nbtn.on { filter:none; opacity:1; color:var(--prim); transform:scale(1.05); }
-.nbtn span { font-size:24px; transition:transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.nbtn.on span { transform:translateY(-2px); }
-
-/* --- KLAVYE AÇIK DURUMU (YENİ CSS) --- */
-body.kb-open .nav { display: none !important; }
-body.kb-open .chips-container { display: none !important; }
-body.kb-open .fixed-bottom-area { bottom: 16px !important; }
 
 /* MODAL / TOAST */
 .ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:900; display:none; align-items:center; justify-content:center; padding:20px;}
@@ -243,7 +231,7 @@ body.kb-open .fixed-bottom-area { bottom: 16px !important; }
 </div>
 
 <div id="login">
-  <div class="login-badge">v1.4</div>
+  <div class="login-badge">v1.5</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -316,39 +304,17 @@ body.kb-open .fixed-bottom-area { bottom: 16px !important; }
   </div>
 </main>
 
-<div class="fixed-bottom-area" id="marketBottom">
-  <div class="chips-container">
-     <div class="chip" onclick="hizliEkle('Ekmek', 'market')">🍞 Ekmek</div>
-     <div class="chip" onclick="hizliEkle('Su', 'market')">💧 Su</div>
-     <div class="chip" onclick="hizliEkle('Süt', 'market')">🥛 Süt</div>
-     <div class="chip" onclick="hizliEkle('Yumurta', 'market')">🥚 Yumurta</div>
-     <div class="chip" onclick="hizliEkle('Peçete', 'market')">🧻 Peçete</div>
-  </div>
-  <div class="fixed-add-bar">
-    <button class="mic-btn" onclick="sesleYazdir('yeniUrun')">🎙</button>
-    <input type="text" id="yeniUrun" placeholder="Market listesine ekle...">
-    <button class="add-btn" onclick="urunEkle()">↑</button>
-  </div>
+<div class="fixed-add-bar" id="addBarMarket">
+  <input type="text" id="yeniUrun" placeholder="Market listesine ekle...">
+  <button class="add-btn" onclick="urunEkle()">↑</button>
 </div>
 
-<div class="fixed-bottom-area" id="butceBottom" style="display:none;">
-  <div class="chips-container">
-     <div class="chip" onclick="hizliEkle('Market', 'butce')">🛒 Market</div>
-     <div class="chip" onclick="hizliEkle('Fatura', 'butce')">⚡ Fatura</div>
-     <div class="chip" onclick="hizliEkle('Yakıt', 'butce')">⛽ Yakıt</div>
-     <div class="chip" onclick="hizliEkle('Dışarıda Yemek', 'butce')">🍔 Dışarıda Yemek</div>
+<div class="fixed-add-bar" id="addBarButce" style="display:none;">
+  <div class="h-inputs">
+    <input type="text" id="hAd" placeholder="Nereye? (Fatura vb.)">
+    <input type="number" id="hTutar" placeholder="Tutar (₺)">
   </div>
-  <div class="fixed-add-bar" style="align-items:stretch;">
-    <button class="mic-btn" style="height:auto;" onclick="sesleYazdir('hAd')">🎙</button>
-    <div class="h-inputs">
-      <div class="h-row">
-        <input type="text" id="hAd" placeholder="Nereye?">
-        <input type="number" id="hTutar" placeholder="Tutar (₺)" style="width:90px; flex:none;">
-      </div>
-      <input type="date" id="hTarih">
-    </div>
-    <button class="add-btn" style="height:auto;" onclick="harcamaEkle()">↑</button>
-  </div>
+  <button class="add-btn" onclick="harcamaEkle()">↑</button>
 </div>
 
 <nav class="nav" id="mainNav">
@@ -407,7 +373,7 @@ let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
 
-// Uzun basım kontrol ve seçili öğe bilgileri
+// Uzun basım kontrol
 window.isLongPress = false;
 let selectedItemId = null;
 let selectedItemTip = null;
@@ -455,19 +421,23 @@ async function initFb() {
   
   document.getElementById('hTarih').valueAsDate = new Date();
 
-  // YENİ KLAVYE FIX (FOCUS/BLUR YÖNTEMİ)
-  const allInputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]');
-  allInputs.forEach(inp => {
-      inp.addEventListener('focus', () => {
-          document.body.classList.add('kb-open');
-      });
-      inp.addEventListener('blur', () => {
-          setTimeout(() => {
-              if (document.activeElement.tagName !== 'INPUT') {
-                  document.body.classList.remove('kb-open');
-              }
-          }, 50);
-      });
+  // KESİN ÇÖZÜM: Android & iOS Klavye Kontrolü (Ekran Daralmasını Dinler)
+  const mainNav = document.getElementById('mainNav');
+  const addBars = document.querySelectorAll('.fixed-add-bar');
+  const viewport = window.visualViewport || window;
+  let baseHeight = viewport.height;
+
+  viewport.addEventListener('resize', () => {
+      // Eğer ekran yüksekliği 100 pikselden fazla daraldıysa (klavye kesinlikle açıldı)
+      if (viewport.height < baseHeight - 100) {
+          mainNav.style.display = 'none'; // Alt menüyü gizle
+          addBars.forEach(bar => bar.style.bottom = '16px'); // Çubuğu klavyenin hemen üstüne oturt
+      } else {
+          // Klavye kapandı
+          mainNav.style.display = 'flex'; // Alt menüyü geri getir
+          addBars.forEach(bar => bar.style.bottom = 'calc(var(--nav) + 16px)'); // Çubuğu eski yerine al
+          baseHeight = viewport.height; // Telefon yan çevrildiyse vs. yeni referansı al
+      }
   });
 }
 
@@ -584,32 +554,6 @@ async function veriyiGuncelle() {
 function userName() { return !user ? "Anonim" : (user.displayName ? user.displayName.split(' ')[0] : "Birisi"); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,4); }
 
-/* --- İŞLEMLER --- */
-function hizliEkle(val, tip) {
-  if(tip === 'market') {
-     document.getElementById('yeniUrun').value = val;
-     document.getElementById('yeniUrun').focus();
-  } else {
-     document.getElementById('hAd').value = val;
-     document.getElementById('hTutar').focus();
-  }
-}
-
-function sesleYazdir(inputId) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SpeechRecognition) return showToast("⚠️ Tarayıcınız sesle yazmayı desteklemiyor");
-  const rec = new SpeechRecognition();
-  rec.lang = 'tr-TR';
-  rec.start();
-  showToast("🎙 Dinliyorum...");
-  rec.onresult = (e) => {
-     document.getElementById(inputId).value = e.results[0][0].transcript;
-     if(inputId === 'yeniUrun') urunEkle(); 
-     if(inputId === 'hAd') document.getElementById('hTutar').focus();
-  };
-  rec.onerror = () => showToast("❌ Ses anlaşılamadı");
-}
-
 function urunEkle() {
   const ad = document.getElementById('yeniUrun').value.trim();
   if(!ad) return;
@@ -620,7 +564,7 @@ function urunEkle() {
 }
 
 function toggleAlindi(id) {
-  if(window.isLongPress) return; // Uzun basıldıysa tıklamayı yok say
+  if(window.isLongPress) return;
   const item = veri.liste.find(x => x.id === id);
   if(item) { item.alindi = !item.alindi; render(); veriyiGuncelle(); }
 }
@@ -730,7 +674,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('on'), 3000);
 }
 
-/* ACTION SHEET & DÜZENLEME (UZUN BASIM) */
+/* ACTION SHEET & DÜZENLEME */
 function openActionSheet(id, tip) {
   selectedItemId = id; selectedItemTip = tip;
   document.getElementById('actionSheet').classList.add('show');
@@ -798,7 +742,6 @@ function kaydetEdit() {
 function baglaLongPress() {
   document.querySelectorAll('.list-item').forEach(el => {
     let pressTimer;
-    // Sağ tık / varsayılan uzun basım menüsünü engelle
     el.addEventListener('contextmenu', e => e.preventDefault());
     
     const start = (e) => {
@@ -807,13 +750,13 @@ function baglaLongPress() {
         window.isLongPress = true;
         haptic();
         openActionSheet(el.dataset.id, el.dataset.tip);
-      }, 500); // 500ms basılı tutma süresi
+      }, 500);
     };
     const cancel = () => clearTimeout(pressTimer);
     
     el.addEventListener('touchstart', start, {passive: true});
     el.addEventListener('touchend', cancel);
-    el.addEventListener('touchmove', cancel); // Parmağı kaydırırsa iptal et
+    el.addEventListener('touchmove', cancel);
     el.addEventListener('mousedown', start);
     el.addEventListener('mouseup', cancel);
     el.addEventListener('mouseleave', cancel);
@@ -822,7 +765,7 @@ function baglaLongPress() {
 
 function haptic() { if (navigator.vibrate) navigator.vibrate(50); }
 
-/* YZ ASİSTAN ALGORİTMASI */
+/* YZ ASİSTAN */
 function asistanTavsiyeleri() {
   const v = veri.aylar[aktifAy];
   const lim = v.limit || 0;
@@ -877,7 +820,6 @@ function renderAsistan() {
 
 function akilliOneriYenile() { asistanIndex++; renderAsistan(); }
 
-/* HTML ÜRETİCİSİ */
 function createListItem(id, htmlContent, tip, clickFn = "") {
   return `
     <div class="list-item" data-id="${id}" data-tip="${tip}" ${clickFn ? `onclick="${clickFn}"` : ''}>
@@ -906,7 +848,6 @@ function buildDeletedHtml(list, tip) {
     </div>`;
 }
 
-/* RENDER */
 function render() {
   if(!veri.aylar) return;
 
@@ -989,8 +930,8 @@ function render() {
 function tab(n) { 
   document.querySelectorAll('.page').forEach((e, i) => e.classList.toggle('on', i+1 === n)); 
   document.querySelectorAll('.nbtn').forEach((e, i) => e.classList.toggle('on', i+1 === n)); 
-  document.getElementById('marketBottom').style.display = n===1 ? 'flex' : 'none'; 
-  document.getElementById('butceBottom').style.display = n===2 ? 'flex' : 'none'; 
+  document.getElementById('addBarMarket').style.display = n===1 ? 'flex' : 'none'; 
+  document.getElementById('addBarButce').style.display = n===2 ? 'flex' : 'none'; 
   document.getElementById('hTarih').valueAsDate = new Date();
   window.scrollTo(0,0); 
 }
