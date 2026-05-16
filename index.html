@@ -11,8 +11,6 @@
 <link rel="icon" type="image/png" href="ev-logo.png">
 <link rel="apple-touch-icon" href="ev-logo.png">
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -218,6 +216,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 
 .toast { position:fixed; top:env(safe-area-inset-top, 20px); left:50%; transform:translate(-50%, -20px); background:var(--txt); color:var(--bg); padding:12px 20px; border-radius:99px; font-size:13px; font-weight:700; z-index:9999; opacity:0; pointer-events:none; box-shadow:0 16px 32px rgba(0,0,0,0.3); transition:.3s cubic-bezier(0.2, 0.8, 0.2, 1); white-space:nowrap; display:flex; align-items:center; gap:8px;}
 .toast.on { opacity:1; transform:translate(-50%, 20px); }
+.h-amt { font-size:15px; font-weight:800; color:var(--txt); pointer-events:none;}
 
 /* ROZETLER MODALI ÖZEL CSS */
 .rozet-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:16px; }
@@ -227,7 +226,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .rozet-ttl { font-size:12px; font-weight:800; color:var(--txt); line-height:1.2;}
 .rozet-desc { font-size:9.5px; font-weight:600; color:var(--txt3); line-height:1.2;}
 
-/* ACTION SHEET */
+/* ACTION SHEET (BASILI TUTUNCA AÇILAN MENÜ) */
 .action-sheet-ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:1000; display:flex; flex-direction:column; justify-content:flex-end; padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
 .action-sheet-ov.show { opacity:1; pointer-events:auto; }
 .action-sheet-wrap { transform:translateY(100%); transition:transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom:env(safe-area-inset-bottom, 0px); }
@@ -252,7 +251,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v4.0 Premium</div>
+  <div class="login-badge">v4.1 Premium</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -316,8 +315,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       </div>
       <div class="top-add-row">
         <input type="number" id="hTutar" placeholder="Tutar (₺)">
-        <button class="mic-btn" style="width:46px;" onclick="document.getElementById('fisInput').click()" title="Fişi Kamerayla Okut">📸</button>
-        <input type="file" id="fisInput" accept="image/*" capture="environment" style="display:none" onchange="fisOkut(event)">
         <input type="date" id="hTarih">
       </div>
       <div class="chips-container">
@@ -572,7 +569,7 @@ async function girisYap() {
   evKodu = kod; localStorage.setItem('ev_kodu', kod);
   const { signInWithPopup, GoogleAuthProvider } = window._fb;
   document.getElementById('loginBtn').textContent = 'Bekleyin...';
-  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { document.getElementById('loginBtn').innerHTML = 'Tekrar Dene'; }
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) { console.log(e); document.getElementById('loginBtn').innerHTML = 'Tekrar Dene'; }
 }
 
 async function cikisYap() {
@@ -636,40 +633,6 @@ async function veriyiGuncelle() {
 
 function userName() { return !user ? "Anonim" : (user.displayName ? user.displayName.split(' ')[0] : "Birisi"); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,4); }
-
-// FİŞ OKUMA FONKSİYONU (YAPAY ZEKA)
-async function fisOkut(e) {
-  const file = e.target.files[0];
-  if(!file) return;
-  
-  showToast("📸 Fiş yapay zeka ile inceleniyor...");
-  haptic();
-  
-  try {
-     const { data: { text } } = await Tesseract.recognize(file, 'tur');
-     // Fişteki muhtemel tutar sayılarını (Örn: 125,50 veya 45.00) buluyoruz
-     const sayilar = text.match(/\d+([.,]\d{2})?/g);
-     if(sayilar && sayilar.length > 0) {
-        // Hepsini ondalıklı sayıya çevirip en büyüğünü alıyoruz (Genelde en büyük sayı GENEL TOPLAM'dır)
-        let floatSayilar = sayilar.map(n => parseFloat(n.replace(',', '.')));
-        let maksimumTutar = Math.max(...floatSayilar);
-        
-        if(maksimumTutar > 0) {
-           document.getElementById('hTutar').value = maksimumTutar;
-           showToast("✅ Fiş başarıyla okundu: " + maksimumTutar + " TL");
-           haptic(100);
-        } else { showToast("⚠️ Fişte net bir tutar bulunamadı."); }
-     } else {
-        showToast("⚠️ Fişte sayısal bir değer okunamadı.");
-     }
-  } catch(error) {
-     console.error(error);
-     showToast("❌ Okuma işlemi başarısız oldu.");
-  }
-  
-  // Inputu temizle ki aynı resmi tekrar seçebilsin
-  e.target.value = '';
-}
 
 function hizliEkle(val, tip) {
   if(tip === 'market') { document.getElementById('yeniUrun').value = val; document.getElementById('yeniUrun').focus(); } 
@@ -832,17 +795,14 @@ function buildDeletedHtml(list, tip) {
 
 // OYUNLAŞTIRMA VE ROZET MOTORU
 function rozetleriHesapla() {
-  // Market Gurmesi Rozeti (Toplam 20 ürün ekleme)
   let toplamUrun = veri.liste.length + veri.silinenListe.length;
   let isGurme = toplamUrun >= 20;
   
-  // Tasarruf Şövalyesi (Bütçeyi aşmama - bu ay için geçerli)
   const ayVeri = veri.aylar[aktifAy];
   let lim = ayVeri.limit || 0;
   let harcama = ayVeri.harcamalar.reduce((s, x) => s + x.tutar, 0);
   let isSovalye = lim > 0 && harcama > 0 && harcama <= lim;
   
-  // Uyumlu Çift (Her iki kişinin de harcama eklemiş olması)
   const kMap = {};
   ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = true; });
   let isUyumlu = Object.keys(kMap).length >= 2;
@@ -915,14 +875,21 @@ function render() {
   const kMap = {}; ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = (kMap[x.ekleyen] || 0) + x.tutar; });
   const kisiler = Object.entries(kMap).sort((a,b)=>b[1]-a[1]);
   const kKutu = document.getElementById('kimNeHarcadiKutu');
-  if(kisiler.length > 0) { kKutu.style.display = 'block'; document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `<div class="u-row"><div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>`).join(''); } 
-  else { kKutu.style.display = 'none'; }
+  if(kisiler.length > 0) {
+    kKutu.style.display = 'block';
+    document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `
+      <div class="u-row"><div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>
+    `).join('');
+  } else { kKutu.style.display = 'none'; }
 
   const hKutu = document.getElementById('harcamaKutusu');
-  if(ayVeri.harcamalar.length === 0) { hKutu.innerHTML = '<div class="empty">Bu periyotta harcama yok.</div>'; } 
-  else {
+  if(ayVeri.harcamalar.length === 0) {
+    hKutu.innerHTML = '<div class="empty">Bu periyotta harcama yok.</div>';
+  } else {
     const siraliH = [...ayVeri.harcamalar].sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
-    hKutu.innerHTML = siraliH.map(x => createListItem(x.id, `<div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${formatZaman(new Date(x.tarih).getTime())}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>`, 'harcama')).join('');
+    hKutu.innerHTML = siraliH.map(x => createListItem(x.id, `
+      <div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${formatZaman(new Date(x.tarih).getTime())}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>
+    `, 'harcama')).join('');
   }
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
