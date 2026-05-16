@@ -57,7 +57,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{font-family:var(--fd);-webkit-text-size-adjust:100%;}
-body{background:var(--bg);color:var(--txt);min-height:100dvh;overflow-x:hidden;transition:background .3s, color .3s;}
+body{background:var(--bg);color:var(--txt);min-height:100dvh;overflow-x:hidden;transition:background .3s, color .3s; overscroll-behavior-y: none;}
 button,input{font-family:var(--fd);border:none;background:none;outline:none;}
 input::placeholder {color: var(--txt3);}
 input[type="date"] { font-family:var(--fd); background:var(--bg2); border:none; border-radius:14px; padding:0 16px; font-size:14px; color:var(--txt); font-weight:600; outline:none; height:46px; flex:1;}
@@ -93,6 +93,10 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .page.on { display:block; animation:fade .3s cubic-bezier(0.2, 0.8, 0.2, 1); }
 @keyframes fade { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
+/* YENİ: AŞAĞI ÇEKEREK YENİLEME (PULL TO REFRESH) */
+#ptr { text-align:center; padding-top:0px; height:0; overflow:hidden; font-size:11px; font-weight:700; color:var(--txt3); display:flex; align-items:center; justify-content:center; gap:6px; text-transform:uppercase; letter-spacing:0.5px; }
+#ptrIcon { font-size:16px; transition:transform 0.2s; }
+
 /* ÜST SABİT EKLEME ALANI (STICKY TOP) */
 .top-add-box { position:sticky; top:calc(var(--top) + env(safe-area-inset-top) + 8px); z-index:100; background:rgba(255,255,255,0.85); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:0.5px solid var(--brd); border-radius:24px; padding:12px; display:flex; flex-direction:column; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.08); margin-bottom:16px; transition:background .3s; }
 [data-theme=dark] .top-add-box { background:rgba(28,28,30,0.85); box-shadow:0 8px 32px rgba(0,0,0,0.4); }
@@ -113,7 +117,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .ay-nav-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; background:var(--surf-solid); padding:8px 12px; border-radius:18px; box-shadow:var(--ios-shadow-sm); border:.5px solid var(--brd); }
 .ay-name { font-weight:800; font-size:12.5px; color:var(--txt); letter-spacing:-0.2px; text-transform:uppercase;}
 
-.group-lbl { font-size:12px; font-weight:800; color:var(--txt3); text-transform:uppercase; letter-spacing:1px; margin:20px 0 8px 8px; }
+.group-lbl { font-size:12px; font-weight:800; color:var(--txt3); text-transform:uppercase; letter-spacing:1px; margin:24px 0 8px 8px; display:flex; align-items:center; gap:6px; }
 
 /* BASİT LİSTE ÖĞESİ */
 .list-item { background:var(--surf-solid); border-radius:16px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; box-shadow:var(--ios-shadow-sm); border:.5px solid var(--brd); transition:background .2s, transform .2s; user-select:none; -webkit-user-select:none; cursor:pointer;}
@@ -214,7 +218,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .toast.on { opacity:1; transform:translate(-50%, 20px); }
 .h-amt { font-size:15px; font-weight:800; color:var(--txt); pointer-events:none;}
 
-/* YENİ iOS ACTION SHEET (BASILI TUTUNCA AÇILAN MENÜ) */
+/* ACTION SHEET (BASILI TUTUNCA AÇILAN MENÜ) */
 .action-sheet-ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:1000; display:flex; flex-direction:column; justify-content:flex-end; padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
 .action-sheet-ov.show { opacity:1; pointer-events:auto; }
 .action-sheet-wrap { transform:translateY(100%); transition:transform .3s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom:env(safe-area-inset-bottom, 0px); }
@@ -239,7 +243,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v2.1</div>
+  <div class="login-badge">v3.0</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -264,9 +268,10 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
   </div>
 </header>
 
+<div id="ptr"><span id="ptrIcon">↓</span> <span id="ptrTxt">Yenilemek için çekin</span></div>
+
 <main>
   <div class="page on" id="p1">
-    
     <div class="top-add-box">
       <div class="top-add-row">
         <button class="mic-btn" onclick="sesleYazdir('yeniUrun')">🎙</button>
@@ -323,7 +328,13 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
     </div>
 
     <div class="card">
-      <div class="c-ttl"><span>Aylık Kalan Bütçe</span> <span onclick="modalAc('mBakiye')" style="cursor:pointer;color:var(--prim)">✎ DEĞİŞTİR</span></div>
+      <div class="c-ttl">
+         <span>Aylık Kalan Bütçe</span> 
+         <div>
+            <span onclick="aylikRaporIndir()" style="cursor:pointer;color:var(--txt3); margin-right:12px; font-size: 11px;">📥 İNDİR</span>
+            <span onclick="modalAc('mBakiye')" style="cursor:pointer;color:var(--prim)">✎ DEĞİŞTİR</span>
+         </div>
+      </div>
       <div class="budget-header">
          <div>
             <div class="budget-val" id="bKalan">₺0</div>
@@ -402,10 +413,33 @@ let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
 
-// Uzun basım kontrol
+// PTR (Yenileme) Değişkenleri
+let ptrStartY = 0, isPulling = false;
+const ptr = document.getElementById('ptr');
+const ptrTxt = document.getElementById('ptrTxt');
+const ptrIcon = document.getElementById('ptrIcon');
+
 window.isLongPress = false;
 let selectedItemId = null;
 let selectedItemTip = null;
+
+// AKILLI KATEGORİ SÖZLÜĞÜ
+const KATEGORILER = {
+  "Manav": ["domates", "biber", "patlıcan", "soğan", "sarımsak", "patates", "elma", "muz", "limon", "meyve", "sebze", "marul", "yeşillik", "havuç", "salata", "kavun", "karpuz", "çilek"],
+  "Süt & Kahvaltılık": ["süt", "peynir", "yoğurt", "tereyağı", "yumurta", "zeytin", "sucuk", "salam", "sosis", "kaymak", "kaşar", "bal", "reçel", "krem"],
+  "Fırın & Pastane": ["ekmek", "simit", "poğaça", "yufka", "un", "tatlı", "pasta", "yulaf", "gevrek"],
+  "Temizlik & Kişisel": ["deterjan", "sabun", "peçete", "tuvalet kağıdı", "çamaşır suyu", "bulaşık", "şampuan", "diş", "fırça", "duş", "temizleyici", "sünger", "çöp", "tıraş", "krem", "deodorant"],
+  "Atıştırmalık": ["çikolata", "bisküvi", "cips", "gofret", "çekirdek", "kuruyemiş", "kola", "meyve suyu", "jelibon", "jelepon", "şeker", "dondurma", "fıstık", "fındık", "sakız"],
+  "Temel Gıda": ["yağ", "şeker", "tuz", "pirinç", "bulgur", "makarna", "mercimek", "salça", "çay", "kahve", "su", "nohut", "fasulye", "sirke", "ketçap", "mayonez", "hardal", "sos"]
+};
+
+function getKategori(ad) {
+   const str = ad.toLocaleLowerCase('tr-TR');
+   for(let k in KATEGORILER) {
+      if(KATEGORILER[k].some(kelime => str.includes(kelime))) return k;
+   }
+   return "Diğer";
+}
 
 function getPeriodId(dStr) {
   const d = dStr ? new Date(dStr) : new Date();
@@ -423,7 +457,6 @@ function getPeriodName(periodId) {
   return `15 ${AYLAR[m-1]} - 14 ${AYLAR[m2-1]}`;
 }
 
-// Akıllı Zaman Damgası Biçimlendirici (Bugün 14:30, Dün 09:15 vb.)
 function formatZaman(ms) {
   if(!ms) return '';
   const d = new Date(ms);
@@ -468,27 +501,53 @@ async function initFb() {
   document.getElementById('hAd').addEventListener('keypress', e => { if(e.key === 'Enter') document.getElementById('hTutar').focus(); });
   document.getElementById('hTarih').valueAsDate = new Date();
 
-  // KESİN VE KUSURSUZ KLAVYE ÇÖZÜMÜ: visualViewport ile ekran yüksekliğini dinliyoruz.
+  // Klavye Kontrolü
   const mainNav = document.getElementById('mainNav');
   if (window.visualViewport) {
       let initialHeight = window.visualViewport.height;
       window.visualViewport.addEventListener('resize', () => {
-          // Tarayıcı çubuğu gizlenip açıldığında da resize tetiklenir, bu yüzden farkı yüksek tutuyoruz (100px).
           if (window.visualViewport.height < initialHeight - 100) {
-              // Klavye açıldı
               mainNav.style.opacity = '0';
               mainNav.style.pointerEvents = 'none';
           } else {
-              // Klavye kapandı
               mainNav.style.opacity = '1';
               mainNav.style.pointerEvents = 'auto';
-              // Eğer ekran boyutu büyüdüyse (örneğin URL çubuğu gizlendiyse) referansı güncelle
-              if (window.visualViewport.height > initialHeight) {
-                  initialHeight = window.visualViewport.height;
-              }
+              if (window.visualViewport.height > initialHeight) initialHeight = window.visualViewport.height;
           }
       });
   }
+
+  // PULL TO REFRESH (Aşağı Çekerek Yenileme)
+  document.addEventListener('touchstart', e => {
+     if(window.scrollY === 0) { ptrStartY = e.touches[0].clientY; isPulling = true; ptr.style.transition = 'none'; }
+  }, {passive:true});
+  
+  document.addEventListener('touchmove', e => {
+     if(!isPulling) return;
+     const dy = e.touches[0].clientY - ptrStartY;
+     if(dy > 0 && window.scrollY === 0) {
+        let h = Math.min(dy * 0.4, 65);
+        ptr.style.height = h + 'px';
+        ptr.style.paddingTop = (h > 10 ? '16px' : '0');
+        if(h > 55) { ptrIcon.style.transform = 'rotate(180deg)'; ptrTxt.textContent = 'Bırakın güncellensin'; }
+        else { ptrIcon.style.transform = 'rotate(0deg)'; ptrTxt.textContent = 'Yenilemek için çekin'; }
+     }
+  }, {passive:true});
+  
+  document.addEventListener('touchend', e => {
+     if(!isPulling) return; isPulling = false;
+     ptr.style.transition = 'height 0.3s, padding-top 0.3s';
+     if(parseInt(ptr.style.height) > 55) {
+        ptr.style.height = '40px'; ptr.style.paddingTop = '16px'; 
+        ptrIcon.style.transform = 'rotate(0deg)'; ptrIcon.textContent = '↻'; ptrTxt.textContent = 'Senkronize ediliyor...';
+        haptic(50);
+        if(unsubscribe) unsubscribe(); // Bağlantıyı kopar ve yeniden kur
+        canliBaglantiKur();
+        setTimeout(() => { ptr.style.height = '0px'; ptr.style.paddingTop = '0px'; setTimeout(() => ptrIcon.textContent = '↓', 300); }, 1200);
+     } else { 
+        ptr.style.height = '0px'; ptr.style.paddingTop = '0px'; 
+     }
+  });
 }
 
 function guvenliKodOlustur() {
@@ -758,6 +817,31 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('on'), 3000);
 }
 
+// EXCEL / CSV İNDİRME FONKSİYONU
+function aylikRaporIndir() {
+  const ayVeri = veri.aylar[aktifAy];
+  if(!ayVeri || !ayVeri.harcamalar || ayVeri.harcamalar.length === 0) return showToast("Bu ay hiç harcama yok.");
+  
+  let csv = "Tarih,Aciklama,Tutar(TL),Ekleyen\n";
+  const siraliH = [...ayVeri.harcamalar].sort((a,b) => new Date(a.tarih) - new Date(b.tarih));
+  
+  siraliH.forEach(h => {
+     const d = new Date(h.tarih).toLocaleDateString('tr-TR');
+     const ad = h.ad.replace(/,/g, ' '); // CSV formatı bozulmasın diye virgüller silinir
+     csv += `${d},${ad},${h.tutar},${h.ekleyen}\n`;
+  });
+  
+  const blob = new Blob(["\uFEFF"+csv], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel UTF-8
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", `EvCuzdani_${aktifAy}_Harcamalar.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast("📊 Rapor indirildi!");
+}
+
 /* ACTION SHEET & DÜZENLEME */
 function openActionSheet(id, tip) {
   selectedItemId = id; selectedItemTip = tip;
@@ -849,7 +933,7 @@ function baglaLongPress() {
 
 function haptic(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
 
-/* YZ ASİSTAN */
+/* YZ ASİSTAN VE GÜNLÜK HEDEF */
 function asistanTavsiyeleri() {
   const v = veri.aylar[aktifAy];
   const lim = v.limit || 0;
@@ -859,6 +943,24 @@ function asistanTavsiyeleri() {
   const kalan = lim - harcanan;
   
   const liste = [];
+  
+  // Günlük Bütçe Hesaplama
+  if(lim > 0 && kalan > 0) {
+      let [yStr, mStr] = aktifAy.split('-');
+      let aY = parseInt(yStr), aM = parseInt(mStr);
+      let nextM = aM + 1; let nextY = aY;
+      if(nextM > 12) { nextM = 1; nextY++; }
+      // Periyot ayın 14'ü gece yarısı biter
+      let bitisTarihi = new Date(nextY, nextM - 1, 14, 23, 59, 59);
+      let bugun = new Date();
+      let kalanGun = Math.ceil((bitisTarihi - bugun) / (1000 * 60 * 60 * 24));
+      
+      if(kalanGun > 0) {
+          let gunluk = kalan / kalanGun;
+          liste.push({tag:"GÜNLÜK HEDEF", txt:`Ayın kapanmasına (14'üne) ${kalanGun} gün var. Günlük en fazla ${gunluk.toLocaleString('tr-TR', {maximumFractionDigits:0})} TL harcayarak ayırdığınız bütçeye tam uyabilirsiniz.`});
+      }
+  }
+
   if(lim === 0 && harcamalar.length === 0) return [{tag:"HOŞ GELDİNİZ", txt:"Aylık bütçe limitinizi belirleyip ilk harcamanızı girerek asistanı uyandırın."}];
   if(lim > 0 && harcamalar.length === 0) liste.push({tag:"PLANLAMA", txt:"Bütçe limitiniz hazır. Harcamalarınızı ekledikçe size özel tasarruf tavsiyeleri üreteceğim."});
   if(pct > 90) liste.push({tag:"KRİTİK SEVİYE", txt:`Bütçenizin %${Math.round(pct)}'sini tükettiniz. Kalan ${kalan.toLocaleString('tr-TR')} TL ile dönemi kapatmak için dikkatli harcama yapın.`});
@@ -943,12 +1045,23 @@ function render() {
     const alinanlar = veri.liste.filter(x => x.alindi);
     let html = '';
     
-    // ALINACAKLAR RENDER
+    // YENİ: KATEGORİLERE GÖRE GRUPLAMA
     if(alinacaklar.length > 0) {
-      html += '<div class="group-lbl">Alınacaklar</div>';
-      html += alinacaklar.map(x => createListItem(x.id, `
-        <div class="l-info"><div class="chk"></div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span>${formatZaman(x.eklemeTarihi)}</span></div></div></div>
-      `, 'urun', `toggleAlindi('${x.id}')`)).join('');
+      let gruplar = {};
+      alinacaklar.forEach(x => {
+         let kat = getKategori(x.ad);
+         if(!gruplar[kat]) gruplar[kat] = [];
+         gruplar[kat].push(x);
+      });
+      
+      const sortedKats = Object.keys(gruplar).sort((a,b) => a==="Diğer" ? 1 : b==="Diğer" ? -1 : a.localeCompare(b));
+      
+      sortedKats.forEach(kat => {
+         html += `<div class="group-lbl">🛒 ${kat.toUpperCase()}</div>`;
+         html += gruplar[kat].map(x => createListItem(x.id, `
+          <div class="l-info"><div class="chk"></div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span>${formatZaman(x.eklemeTarihi)}</span></div></div></div>
+         `, 'urun', `toggleAlindi('${x.id}')`)).join('');
+      });
     }
     
     // ALINANLAR RENDER
