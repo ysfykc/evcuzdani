@@ -155,11 +155,11 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .bought-sec.open .bought-body { display: block; animation: fade .3s; }
 
 /* AKILLI ASİSTAN */
-.ai-card { background:var(--surf-solid); border-radius:20px; padding:14px 16px; box-shadow:var(--ios-shadow-sm); border:.5px solid rgba(52, 199, 89, 0.3); margin-bottom:16px; display:none; animation:fade .4s ease; border-left:4px solid var(--sec);}
+.ai-card { background:var(--surf-solid); border-radius:20px; padding:14px 16px; box-shadow:var(--ios-shadow-sm); border:.5px solid rgba(52, 199, 89, 0.3); margin-bottom:16px; display:none; animation:fade .4s ease; border-left:4px solid var(--sec); transition: all 0.3s ease;}
 .ai-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
 .ai-ttl { font-size:12px; font-weight:800; display:flex; align-items:center; gap:6px; color:var(--txt);}
 .ai-icon { font-size:16px; }
-.ai-tag { font-size:9px; font-weight:800; background:var(--sec-bg); color:var(--sec); padding:3px 8px; border-radius:99px; letter-spacing:0.5px; text-transform:uppercase; }
+.ai-tag { font-size:9px; font-weight:800; background:var(--sec-bg); color:var(--sec); padding:3px 8px; border-radius:99px; letter-spacing:0.5px; text-transform:uppercase; transition: all 0.3s ease; }
 .ai-txt { font-size:12.5px; color:var(--txt2); line-height:1.4; font-weight:500;}
 .ai-action { display:flex; margin-top:10px; gap:8px; }
 .ai-btn { padding:6px 12px; background:var(--bg2); border-radius:99px; font-size:10.5px; font-weight:700; color:var(--txt2); cursor:pointer; }
@@ -251,7 +251,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v4.1 Premium</div>
+  <div class="login-badge">v4.2 Premium</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -461,6 +461,9 @@ const KATEGORILER = {
   "Atıştırmalık": ["çikolata", "bisküvi", "cips", "gofret", "çekirdek", "kuruyemiş", "kola", "meyve suyu", "jelibon", "jelepon", "şeker", "dondurma", "fıstık", "fındık", "sakız"],
   "Temel Gıda": ["yağ", "şeker", "tuz", "pirinç", "bulgur", "makarna", "mercimek", "salça", "çay", "kahve", "su", "nohut", "fasulye", "sirke", "ketçap", "mayonez", "hardal", "sos"]
 };
+
+// YENİ EKLENEN: FİNANSAL SIZINTI RADARI KELİMELERİ
+const SIZINTI_KELIMELER = ["kahve", "starbucks", "trendyol", "hepsiburada", "dışarıda", "yemeksepeti", "getir", "sinema", "oyun", "abonelik", "netflix", "spotify", "tatlı", "çikolata", "cips", "avm", "burger", "pizza"];
 
 function getKategori(ad) {
    const str = ad.toLocaleLowerCase('tr-TR');
@@ -749,6 +752,7 @@ function baglaLongPress() {
 
 function haptic(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
 
+// YENİ EKLENEN: SIZINTI ODAKLI ASİSTAN TAVSİYELERİ
 function asistanTavsiyeleri() {
   const v = veri.aylar[aktifAy]; const lim = v.limit || 0; const harcamalar = v.harcamalar || []; const harcanan = harcamalar.reduce((s, x) => s + x.tutar, 0); const pct = lim ? (harcanan / lim) * 100 : 0; const kalan = lim - harcanan;
   const liste = [];
@@ -756,32 +760,60 @@ function asistanTavsiyeleri() {
   if(lim > 0 && kalan > 0) {
       let [yStr, mStr] = aktifAy.split('-'); let aY = parseInt(yStr), aM = parseInt(mStr); let nextM = aM + 1; let nextY = aY; if(nextM > 12) { nextM = 1; nextY++; }
       let bitisTarihi = new Date(nextY, nextM - 1, 14, 23, 59, 59); let bugun = new Date(); let kalanGun = Math.ceil((bitisTarihi - bugun) / (1000 * 60 * 60 * 24));
-      if(kalanGun > 0) { let gunluk = kalan / kalanGun; liste.push({tag:"GÜNLÜK HEDEF", txt:`Ayın kapanmasına ${kalanGun} gün var. Günlük en fazla ${gunluk.toLocaleString('tr-TR', {maximumFractionDigits:0})} TL harcayarak ayırdığınız bütçeye tam uyabilirsiniz.`}); }
+      if(kalanGun > 0) { let gunluk = kalan / kalanGun; liste.push({tag:"GÜNLÜK HEDEF", txt:`Ayın kapanmasına ${kalanGun} gün var. Günlük en fazla ${gunluk.toLocaleString('tr-TR', {maximumFractionDigits:0})} TL harcayarak bütçeye tam uyabilirsiniz.`, color:"var(--sec)"}); }
   }
 
-  if(lim === 0 && harcamalar.length === 0) return [{tag:"HOŞ GELDİNİZ", txt:"Aylık bütçe limitinizi belirleyip ilk harcamanızı girerek asistanı uyandırın."}];
-  if(lim > 0 && harcamalar.length === 0) liste.push({tag:"PLANLAMA", txt:"Bütçe limitiniz hazır. Harcamalarınızı ekledikçe size özel tasarruf tavsiyeleri üreteceğim."});
-  if(pct > 90) liste.push({tag:"KRİTİK SEVİYE", txt:`Bütçenizin %${Math.round(pct)}'sini tükettiniz. Kalan ${kalan.toLocaleString('tr-TR')} TL ile dönemi kapatmak için dikkatli harcama yapın.`});
-  else if(pct > 75) liste.push({tag:"DİKKAT", txt:"Bütçe limitinizin büyük kısmı kullanıldı. Kalan günlerde büyük harcamaları ertelemek faydalı olabilir."});
-  else if(pct < 40 && harcamalar.length > 4) liste.push({tag:"HARİKA GİDİŞAT", txt:"Bütçe yönetiminiz şu an mükemmel ilerliyor. Bu disiplinle ay sonunda ciddi tasarruf edebilirsiniz."});
+  if(lim === 0 && harcamalar.length === 0) return [{tag:"HOŞ GELDİNİZ", txt:"Aylık bütçe limitinizi belirleyip ilk harcamanızı girerek asistanı uyandırın.", color:"var(--sec)"}];
+  if(lim > 0 && harcamalar.length === 0) liste.push({tag:"PLANLAMA", txt:"Bütçe limitiniz hazır. Harcamalarınızı ekledikçe size özel tasarruf tavsiyeleri üreteceğim.", color:"var(--sec)"});
   
-  if(harcamalar.length > 2) {
-     const kGrup = {}; harcamalar.forEach(h => { const kelime = h.ad.split(' ')[0].toUpperCase(); if(kelime.length > 2) kGrup[kelime] = (kGrup[kelime] || 0) + h.tutar; });
-     const enBuyuk = Object.entries(kGrup).sort((a,b)=>b[1]-a[1])[0];
-     if(enBuyuk && enBuyuk[1] > (lim * 0.15) && lim > 0) { liste.push({tag:"HARCAMA ANALİZİ", txt:`Bu dönem "${enBuyuk[0]}" harcamaları bütçenizin önemli bir kısmını (${enBuyuk[1].toLocaleString('tr-TR')} TL) oluşturuyor.`}); }
+  let sizintiHarcamalar = harcamalar.filter(h => {
+      let adLower = h.ad.toLocaleLowerCase('tr-TR');
+      return SIZINTI_KELIMELER.some(k => adLower.includes(k));
+  });
+  let sizintiToplam = sizintiHarcamalar.reduce((s, x) => s + x.tutar, 0);
+  let sizintiSayisi = sizintiHarcamalar.length;
+
+  if (sizintiToplam > (lim * 0.15) && lim > 0) {
+      liste.push({tag:"🚨 FİNANSAL SIZINTI", txt:`Bu ay dışarıda yeme, online alışveriş gibi esnek harcamalara toplam ${sizintiToplam.toLocaleString('tr-TR')} TL gitti. Bu kategoriyi biraz frenlemek bütçeyi rahatlatacaktır.`, color:"var(--prim)"});
+  } else if (sizintiSayisi > 3) {
+      liste.push({tag:"🎯 MİKRO HARCAMA UYARISI", txt:`Bu ay ${sizintiSayisi} kez ufak tefek keyfi harcama yaptınız. "Latte Etkisi"ne dikkat! Damlaya damlaya göl olur.`, color:"#ff9f0a"});
   }
+
+  if(pct > 90) liste.push({tag:"KRİTİK SEVİYE", txt:`Bütçenizin %${Math.round(pct)}'sini tükettiniz. Kalan ${kalan.toLocaleString('tr-TR')} TL ile dönemi kapatmak için dikkatli harcama yapın.`, color:"var(--prim)"});
+  else if(pct > 75) liste.push({tag:"DİKKAT", txt:"Bütçe limitinizin büyük kısmı kullanıldı. Kalan günlerde büyük harcamaları ertelemek faydalı olabilir.", color:"#ff9f0a"});
+  else if(pct < 40 && harcamalar.length > 4 && sizintiToplam < (lim * 0.05)) liste.push({tag:"HARİKA GİDİŞAT", txt:"Bütçe yönetiminiz ve tasarruf iradeniz şu an mükemmel ilerliyor. Tebrikler!", color:"var(--sec)"});
+  
   const km = {}; harcamalar.forEach(x => { km[x.ekleyen] = (km[x.ekleyen] || 0) + x.tutar; }); const kArr = Object.keys(km);
-  if(kArr.length > 1) liste.push({tag:"TAKIM İŞİ", txt:`${kArr.join(' ve ')} bütçeye birlikte yön veriyor. Ortak finansal takip, ev ekonomisinin en büyük gücüdür!`});
-  const marketKalan = veri.liste.filter(x => !x.alindi).length;
-  if(marketKalan > 4 && kalan < (lim * 0.2) && lim > 0) { liste.push({tag:"MARKET UYARISI", txt:`Market listenizde alınmayı bekleyen ${marketKalan} ürün var ancak bütçeniz epey azalmış.`}); }
-  if(liste.length === 0) liste.push({tag:"GÖZLEM", txt:"Harcama verileriniz dengeli görünüyor. Siz harcamalarınızı girdikçe analiz etmeye devam edeceğim."});
+  if(kArr.length > 1) liste.push({tag:"TAKIM İŞİ", txt:`${kArr.join(' ve ')} bütçeye birlikte yön veriyor. Ortak finansal takip, ev ekonomisinin en büyük gücüdür!`, color:"#007aff"});
+  
+  if(liste.length === 0) liste.push({tag:"GÖZLEM", txt:"Harcama verileriniz dengeli görünüyor. Siz harcamalarınızı girdikçe analiz etmeye devam edeceğim.", color:"var(--sec)"});
   return liste;
 }
 
+// YENİ EKLENEN: DİNAMİK RENKLİ RENDER ASİSTAN
 function renderAsistan() {
   const c = document.getElementById('aiCard'); if(!veri.aylar || !veri.aylar[aktifAy]) { c.style.display='none'; return; }
   const list = asistanTavsiyeleri();
-  if(list.length > 0) { c.style.display = 'block'; const s = list[asistanIndex % list.length]; document.getElementById('aiTag').textContent = s.tag; document.getElementById('aiTxt').textContent = s.txt; } else { c.style.display = 'none'; }
+  if(list.length > 0) { 
+      c.style.display = 'block'; 
+      const s = list[asistanIndex % list.length]; 
+      
+      const tagEl = document.getElementById('aiTag');
+      tagEl.textContent = s.tag; 
+      document.getElementById('aiTxt').textContent = s.txt; 
+      
+      const temaRenk = s.color || 'var(--sec)';
+      tagEl.style.color = temaRenk;
+      c.style.borderLeft = `4px solid ${temaRenk}`;
+      
+      if(temaRenk === 'var(--prim)') tagEl.style.backgroundColor = 'var(--prim-bg)';
+      else if(temaRenk === 'var(--sec)') tagEl.style.backgroundColor = 'var(--sec-bg)';
+      else if(temaRenk === '#ff9f0a') tagEl.style.backgroundColor = 'rgba(255, 159, 10, 0.15)';
+      else if(temaRenk === '#007aff') tagEl.style.backgroundColor = 'rgba(0, 122, 255, 0.15)';
+      
+  } else { 
+      c.style.display = 'none'; 
+  }
 }
 
 function akilliOneriYenile() { asistanIndex++; renderAsistan(); }
