@@ -112,6 +112,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .chips-container::-webkit-scrollbar { display:none; }
 .chip { background:var(--surf-solid); border:1px solid var(--brd); color:var(--txt); padding:8px 14px; border-radius:99px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:.2s; box-shadow:var(--ios-shadow-sm); }
 .chip:active { transform:scale(0.95); background:var(--bg2);}
+.chip-emoji { opacity: 0.6; margin-right: 2px; }
 
 /* AY NAVIGASYONU */
 .ay-nav-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; background:var(--surf-solid); padding:8px 12px; border-radius:18px; box-shadow:var(--ios-shadow-sm); border:.5px solid var(--brd); }
@@ -251,7 +252,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v4.2 Premium</div>
+  <div class="login-badge">v4.3 Premium</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -287,13 +288,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
         <input type="text" id="yeniUrun" placeholder="Market listesine ekle...">
         <button class="add-btn" onclick="urunEkle()">+</button>
       </div>
-      <div class="chips-container">
-         <div class="chip" onclick="hizliEkle('Ekmek', 'market')">🍞 Ekmek</div>
-         <div class="chip" onclick="hizliEkle('Su', 'market')">💧 Su</div>
-         <div class="chip" onclick="hizliEkle('Süt', 'market')">🥛 Süt</div>
-         <div class="chip" onclick="hizliEkle('Yumurta', 'market')">🥚 Yumurta</div>
-         <div class="chip" onclick="hizliEkle('Peçete', 'market')">🧻 Peçete</div>
-      </div>
+      <div class="chips-container" id="marketChips"></div>
     </div>
 
     <div id="listeKutusu"></div>
@@ -317,12 +312,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
         <input type="number" id="hTutar" placeholder="Tutar (₺)">
         <input type="date" id="hTarih">
       </div>
-      <div class="chips-container">
-         <div class="chip" onclick="hizliEkle('Market', 'butce')">🛒 Market</div>
-         <div class="chip" onclick="hizliEkle('Fatura', 'butce')">⚡ Fatura</div>
-         <div class="chip" onclick="hizliEkle('Yakıt', 'butce')">⛽ Yakıt</div>
-         <div class="chip" onclick="hizliEkle('Dışarıda Yemek', 'butce')">🍔 Dışarıda Yemek</div>
-      </div>
+      <div class="chips-container" id="butceChips"></div>
     </div>
 
     <div class="ai-card" id="aiCard">
@@ -446,23 +436,25 @@ let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
 
-// PTR (Yenileme)
 let ptrStartY = 0, isPulling = false;
 const ptr = document.getElementById('ptr'), ptrTxt = document.getElementById('ptrTxt'), ptrIcon = document.getElementById('ptrIcon');
 
 window.isLongPress = false; let selectedItemId = null, selectedItemTip = null;
 
-// AKILLI KATEGORİ SÖZLÜĞÜ
+// YENİ: GENİŞLETİLMİŞ VE ÇEŞİTLENDİRİLMİŞ KATEGORİ SÖZLÜĞÜ
 const KATEGORILER = {
-  "Manav": ["domates", "biber", "patlıcan", "soğan", "sarımsak", "patates", "elma", "muz", "limon", "meyve", "sebze", "marul", "yeşillik", "havuç", "salata", "kavun", "karpuz", "çilek"],
-  "Süt & Kahvaltılık": ["süt", "peynir", "yoğurt", "tereyağı", "yumurta", "zeytin", "sucuk", "salam", "sosis", "kaymak", "kaşar", "bal", "reçel", "krem"],
-  "Fırın & Pastane": ["ekmek", "simit", "poğaça", "yufka", "un", "tatlı", "pasta", "yulaf", "gevrek"],
-  "Temizlik & Kişisel": ["deterjan", "sabun", "peçete", "tuvalet kağıdı", "çamaşır suyu", "bulaşık", "şampuan", "diş", "fırça", "duş", "temizleyici", "sünger", "çöp", "tıraş", "krem", "deodorant"],
-  "Atıştırmalık": ["çikolata", "bisküvi", "cips", "gofret", "çekirdek", "kuruyemiş", "kola", "meyve suyu", "jelibon", "jelepon", "şeker", "dondurma", "fıstık", "fındık", "sakız"],
-  "Temel Gıda": ["yağ", "şeker", "tuz", "pirinç", "bulgur", "makarna", "mercimek", "salça", "çay", "kahve", "su", "nohut", "fasulye", "sirke", "ketçap", "mayonez", "hardal", "sos"]
+  "Manav": ["domates", "biber", "patlıcan", "soğan", "sarımsak", "patates", "elma", "muz", "limon", "meyve", "sebze", "marul", "yeşillik", "havuç", "salata", "kavun", "karpuz", "çilek", "portakal", "mandalina"],
+  "Et & Tavuk & Balık": ["et", "kıyma", "tavuk", "balık", "ciğer", "kanat", "göğüs", "baget"],
+  "Süt & Kahvaltılık": ["süt", "peynir", "yoğurt", "tereyağı", "yumurta", "zeytin", "sucuk", "salam", "sosis", "kaymak", "kaşar", "bal", "reçel", "krem peynir", "labne"],
+  "Fırın & Pastane": ["ekmek", "simit", "poğaça", "yufka", "un", "tatlı", "pasta", "yulaf", "gevrek", "galeta", "börek"],
+  "Baharat": ["karabiber", "pul biber", "pulbiber", "nane", "kekik", "kimyon", "sumak", "köri", "tarçın", "karanfil", "zerdeçal", "fesleğen"],
+  "Temizlik & Kişisel": ["deterjan", "sabun", "peçete", "tuvalet kağıdı", "çamaşır suyu", "bulaşık", "şampuan", "diş", "fırça", "duş", "temizleyici", "sünger", "çöp", "tıraş", "krem", "deodorant", "yumuşatıcı", "camsil"],
+  "İçecek": ["su", "kola", "fanta", "sprite", "meyve suyu", "çay", "kahve", "soda", "maden suyu", "ayran", "şalgam"],
+  "Bebek & Çocuk": ["bebek bezi", "ıslak mendil", "bebek maması", "emzik", "biberon", "oyuncak"],
+  "Atıştırmalık": ["çikolata", "bisküvi", "cips", "gofret", "çekirdek", "kuruyemiş", "jelibon", "şeker", "dondurma", "fıstık", "fındık", "sakız", "kraker"],
+  "Temel Gıda": ["yağ", "şeker", "tuz", "pirinç", "bulgur", "makarna", "mercimek", "salça", "nohut", "fasulye", "sirke", "ketçap", "mayonez", "hardal", "sos", "konserve"]
 };
 
-// YENİ EKLENEN: FİNANSAL SIZINTI RADARI KELİMELERİ
 const SIZINTI_KELIMELER = ["kahve", "starbucks", "trendyol", "hepsiburada", "dışarıda", "yemeksepeti", "getir", "sinema", "oyun", "abonelik", "netflix", "spotify", "tatlı", "çikolata", "cips", "avm", "burger", "pizza"];
 
 function getKategori(ad) {
@@ -498,7 +490,6 @@ function formatZaman(ms) {
   return `${d.getDate()} ${AYLAR[d.getMonth()]} ${saat}`;
 }
 
-// OTOMATİK TEMA YARDIMCISI
 function getSystemTheme() {
    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -520,7 +511,6 @@ async function initFb() {
     } else { document.getElementById('login').style.display = 'flex'; }
   });
 
-  // TEMA BAŞLATMA
   let savedTheme = localStorage.getItem('evTema_v2') || 'auto';
   if(savedTheme === 'auto') document.documentElement.dataset.theme = getSystemTheme();
   else document.documentElement.dataset.theme = savedTheme;
@@ -752,7 +742,6 @@ function baglaLongPress() {
 
 function haptic(ms = 50) { if (navigator.vibrate) navigator.vibrate(ms); }
 
-// YENİ EKLENEN: SIZINTI ODAKLI ASİSTAN TAVSİYELERİ
 function asistanTavsiyeleri() {
   const v = veri.aylar[aktifAy]; const lim = v.limit || 0; const harcamalar = v.harcamalar || []; const harcanan = harcamalar.reduce((s, x) => s + x.tutar, 0); const pct = lim ? (harcanan / lim) * 100 : 0; const kalan = lim - harcanan;
   const liste = [];
@@ -790,7 +779,6 @@ function asistanTavsiyeleri() {
   return liste;
 }
 
-// YENİ EKLENEN: DİNAMİK RENKLİ RENDER ASİSTAN
 function renderAsistan() {
   const c = document.getElementById('aiCard'); if(!veri.aylar || !veri.aylar[aktifAy]) { c.style.display='none'; return; }
   const list = asistanTavsiyeleri();
@@ -818,6 +806,48 @@ function renderAsistan() {
 
 function akilliOneriYenile() { asistanIndex++; renderAsistan(); }
 
+// YENİ: DİNAMİK ÇİP OLUŞTURUCU
+function dinamikCipleriOlustur() {
+  // 1. Market Çipleri
+  const marketFrekans = {};
+  const tumUrunler = [...veri.liste, ...veri.silinenListe];
+  tumUrunler.forEach(u => {
+      const ad = u.ad.trim();
+      if(ad.length > 2) marketFrekans[ad] = (marketFrekans[ad] || 0) + 1;
+  });
+  let populerMarket = Object.entries(marketFrekans).sort((a,b) => b[1] - a[1]).map(x => x[0]).slice(0, 7);
+  
+  if(populerMarket.length < 5) {
+      const varsayilan = ["Ekmek", "Su", "Süt", "Yumurta", "Peçete", "Domates"];
+      varsayilan.forEach(v => { if(!populerMarket.includes(v)) populerMarket.push(v); });
+  }
+  populerMarket = populerMarket.slice(0, 7);
+  
+  document.getElementById('marketChips').innerHTML = populerMarket.map(ad => `<div class="chip" onclick="hizliEkle('${ad}', 'market')"><span class="chip-emoji">+</span> ${ad}</div>`).join('');
+
+  // 2. Bütçe Çipleri
+  const harcamaFrekans = {};
+  let tumHarcamalar = [];
+  Object.values(veri.aylar).forEach(ay => {
+      tumHarcamalar = [...tumHarcamalar, ...(ay.harcamalar || []), ...(ay.silinenHarcamalar || [])];
+  });
+  
+  tumHarcamalar.forEach(h => {
+      const ad = h.ad.trim();
+      if(ad.length > 2) harcamaFrekans[ad] = (harcamaFrekans[ad] || 0) + 1;
+  });
+  
+  let populerHarcama = Object.entries(harcamaFrekans).sort((a,b) => b[1] - a[1]).map(x => x[0]).slice(0, 6);
+  
+  if(populerHarcama.length < 4) {
+      const hVarsayilan = ["Market", "Akaryakıt", "Dışarıda Yemek", "Kişisel Bakım"];
+      hVarsayilan.forEach(v => { if(!populerHarcama.includes(v)) populerHarcama.push(v); });
+  }
+  populerHarcama = populerHarcama.slice(0, 6);
+  
+  document.getElementById('butceChips').innerHTML = populerHarcama.map(ad => `<div class="chip" onclick="hizliEkle('${ad}', 'butce')"><span class="chip-emoji">+</span> ${ad}</div>`).join('');
+}
+
 function createListItem(id, htmlContent, tip, clickFn = "") { return `<div class="list-item" data-id="${id}" data-tip="${tip}" ${clickFn ? `onclick="${clickFn}"` : ''}>${htmlContent}</div>`; }
 
 function buildDeletedHtml(list, tip) {
@@ -825,7 +855,6 @@ function buildDeletedHtml(list, tip) {
   return `<div class="deleted-sec"><div class="deleted-head" onclick="this.nextElementSibling.classList.toggle('on')"><span>🗑 Son Silinenler (${list.length})</span> <span>Gör ▼</span></div><div class="deleted-body">${list.map(x => `<div class="d-item"><div class="d-info"><div class="d-name">${x.ad} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div><div class="d-meta">${x.ekleyen} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div></div><div class="d-actions"><button class="d-btn" onclick="${tip==='harcama' ? 'harcamaGeriAl' : 'urunGeriAl'}('${x.id}')">Geri Al</button><button class="d-btn red" onclick="${tip==='harcama' ? 'harcamaKaliciSil' : 'urunKaliciSil'}('${x.id}')">Sil</button></div></div>`).join('')}</div></div>`;
 }
 
-// OYUNLAŞTIRMA VE ROZET MOTORU
 function rozetleriHesapla() {
   let toplamUrun = veri.liste.length + veri.silinenListe.length;
   let isGurme = toplamUrun >= 20;
@@ -844,7 +873,6 @@ function rozetleriHesapla() {
   document.getElementById('r-uyumlu').className = 'rozet ' + (isUyumlu ? 'on' : '');
 }
 
-// TEMAYI OTOMATİĞE ALMA VEYA DEĞİŞTİRME MANTIĞI
 function temaDegis() {
    let currentTheme = localStorage.getItem('evTema_v2') || 'auto';
    let nextTheme = '';
@@ -867,6 +895,8 @@ function temaDegis() {
 
 function render() {
   if(!veri.aylar) return;
+
+  dinamikCipleriOlustur();
 
   const lKutu = document.getElementById('listeKutusu');
   if(veri.liste.length === 0) { lKutu.innerHTML = '<div class="empty"><div style="font-size:48px;margin-bottom:12px">🛒</div>Şu an alınacak bir şey yok.<br>Aşağıdan listeye ekleyebilirsiniz.</div>'; } 
