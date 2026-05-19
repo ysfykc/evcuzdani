@@ -12,6 +12,8 @@
 <link rel="apple-touch-icon" href="ev-logo.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 :root {
   --bg: #f2f2f7; 
@@ -252,7 +254,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v4.3 Premium</div>
+  <div class="login-badge">v4.4 Premium</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -345,6 +347,13 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       </div>
     </div>
     
+    <div class="card" id="kategoriChartCard" style="display:none; padding:18px 20px 24px;">
+      <div class="c-ttl">KATEGORİ BAZLI ANALİZ</div>
+      <div style="position: relative; height: 210px; width: 100%; margin-top: 16px;">
+        <canvas id="kategoriChart"></canvas>
+      </div>
+    </div>
+
     <div class="card" id="kimNeHarcadiKutu" style="display:none; padding:14px 20px;">
       <div class="c-ttl">KİŞİ BAZLI ÖZET</div>
       <div id="kimNeHarcadi"></div>
@@ -435,13 +444,12 @@ let aktifAy = getPeriodId();
 let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
+let chartInstance = null; // GRAFİK İÇİN GLOBAL DEĞİŞKEN
 
 let ptrStartY = 0, isPulling = false;
 const ptr = document.getElementById('ptr'), ptrTxt = document.getElementById('ptrTxt'), ptrIcon = document.getElementById('ptrIcon');
-
 window.isLongPress = false; let selectedItemId = null, selectedItemTip = null;
 
-// YENİ: GENİŞLETİLMİŞ VE ÇEŞİTLENDİRİLMİŞ KATEGORİ SÖZLÜĞÜ
 const KATEGORILER = {
   "Manav": ["domates", "biber", "patlıcan", "soğan", "sarımsak", "patates", "elma", "muz", "limon", "meyve", "sebze", "marul", "yeşillik", "havuç", "salata", "kavun", "karpuz", "çilek", "portakal", "mandalina"],
   "Et & Tavuk & Balık": ["et", "kıyma", "tavuk", "balık", "ciğer", "kanat", "göğüs", "baget"],
@@ -461,6 +469,17 @@ function getKategori(ad) {
    const str = ad.toLocaleLowerCase('tr-TR');
    for(let k in KATEGORILER) { if(KATEGORILER[k].some(kelime => str.includes(kelime))) return k; }
    return "Diğer";
+}
+
+// YENİ: GRAFİK İÇİN HARCAMA KATEGORİLEME SİSTEMİ
+function getHarcamaKategori(ad) {
+    const str = ad.toLocaleLowerCase('tr-TR');
+    if (str.includes('market') || str.includes('bakkal') || str.includes('şok') || str.includes('bim') || str.includes('a101') || str.includes('migros')) return '🛒 Market';
+    if (str.includes('fatura') || str.includes('elektrik') || str.includes('su') || str.includes('doğalgaz') || str.includes('internet') || str.includes('aidat')) return '⚡ Fatura & Sabit';
+    if (str.includes('yakıt') || str.includes('benzin') || str.includes('mazot') || str.includes('otobüs') || str.includes('taksi') || str.includes('ulaşım')) return '⛽ Ulaşım';
+    if (SIZINTI_KELIMELER.some(k => str.includes(k)) || str.includes('dışarıda') || str.includes('yemek')) return '🍔 Eğlence & Esnek';
+    if (str.includes('kıyafet') || str.includes('giyim') || str.includes('ayakkabı') || str.includes('bakım') || str.includes('eczane')) return '🛍️ Alışveriş & Bakım';
+    return '📦 Diğer';
 }
 
 function getPeriodId(dStr) {
@@ -806,9 +825,7 @@ function renderAsistan() {
 
 function akilliOneriYenile() { asistanIndex++; renderAsistan(); }
 
-// YENİ: DİNAMİK ÇİP OLUŞTURUCU
 function dinamikCipleriOlustur() {
-  // 1. Market Çipleri
   const marketFrekans = {};
   const tumUrunler = [...veri.liste, ...veri.silinenListe];
   tumUrunler.forEach(u => {
@@ -825,7 +842,6 @@ function dinamikCipleriOlustur() {
   
   document.getElementById('marketChips').innerHTML = populerMarket.map(ad => `<div class="chip" onclick="hizliEkle('${ad}', 'market')"><span class="chip-emoji">+</span> ${ad}</div>`).join('');
 
-  // 2. Bütçe Çipleri
   const harcamaFrekans = {};
   let tumHarcamalar = [];
   Object.values(veri.aylar).forEach(ay => {
@@ -891,6 +907,9 @@ function temaDegis() {
        showToast(nextTheme === 'dark' ? "🌙 Tema: Karanlık" : "☀️ Tema: Aydınlık");
    }
    document.getElementById('themeColorMeta').content = document.documentElement.dataset.theme === 'dark' ? '#000000' : '#f2f2f7';
+   
+   // Tema değişince grafiği güncel renklerle tekrar çizmesi için
+   render(); 
 }
 
 function render() {
@@ -933,6 +952,74 @@ function render() {
   const ringColor = pct > 90 ? 'var(--prim)' : 'var(--sec)';
   document.getElementById('budgetRing').style.background = `conic-gradient(${ringColor} ${pct}%, var(--bg2) 0%)`;
   document.getElementById('budgetRingVal').textContent = `%${Math.round(pct)}`;
+
+  // YENİ: KATEGORİ GRAFİĞİNİ OLUŞTURMA (CHART.JS)
+  const chartCard = document.getElementById('kategoriChartCard');
+  if(ayVeri.harcamalar.length === 0) {
+      chartCard.style.display = 'none';
+  } else {
+      chartCard.style.display = 'block';
+      const kToplam = {};
+      ayVeri.harcamalar.forEach(h => {
+          const k = getHarcamaKategori(h.ad);
+          kToplam[k] = (kToplam[k] || 0) + h.tutar;
+      });
+
+      const sortedKats = Object.entries(kToplam).sort((a,b) => b[1] - a[1]);
+      const labels = sortedKats.map(x => x[0]);
+      const data = sortedKats.map(x => x[1]);
+
+      const ctx = document.getElementById('kategoriChart').getContext('2d');
+      if(chartInstance) chartInstance.destroy(); // Eski grafiği temizle
+
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      const txtColor = isDark ? '#ebebf5' : '#8e8e93';
+      const borderColor = isDark ? '#1c1c1e' : '#ffffff';
+      // Grafikteki şık iOS renk paleti
+      const chartColors = ['#ff3b30', '#ff9f0a', '#34c759', '#007aff', '#af52de', '#ff2d55', '#5856d6'];
+
+      chartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: labels,
+              datasets: [{
+                  data: data,
+                  backgroundColor: chartColors.slice(0, labels.length),
+                  borderWidth: 3,
+                  borderColor: borderColor,
+                  hoverOffset: 6
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              cutout: '75%',
+              layout: { padding: { bottom: 10 } },
+              plugins: {
+                  legend: {
+                      position: 'bottom', // Mobilde daha iyi görünüm için altta
+                      labels: {
+                          color: txtColor,
+                          padding: 12,
+                          font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
+                          usePointStyle: true,
+                          pointStyle: 'circle'
+                      }
+                  },
+                  tooltip: {
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)',
+                      titleColor: isDark ? '#000' : '#fff',
+                      bodyColor: isDark ? '#000' : '#fff',
+                      bodyFont: { font: { family: "'Inter', sans-serif", weight: 'bold' } },
+                      callbacks: {
+                          label: function(context) { return ' ₺' + context.raw.toLocaleString('tr-TR'); }
+                      }
+                  }
+              },
+              animation: { animateScale: true, animateRotate: true }
+          }
+      });
+  }
 
   const kMap = {}; ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = (kMap[x.ekleyen] || 0) + x.tutar; });
   const kisiler = Object.entries(kMap).sort((a,b)=>b[1]-a[1]);
