@@ -254,7 +254,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <div id="login">
-  <div class="login-badge">v4.4 Premium</div>
+  <div class="login-badge">v4.5 Premium</div>
   <img src="ev-logo.png" class="login-bg" alt="Ev Cüzdanı Logo">
   <div class="box">
     <input type="text" id="evKodu" class="fam-code" placeholder="GÜVENLİ AİLE KODU">
@@ -450,28 +450,40 @@ let ptrStartY = 0, isPulling = false;
 const ptr = document.getElementById('ptr'), ptrTxt = document.getElementById('ptrTxt'), ptrIcon = document.getElementById('ptrIcon');
 window.isLongPress = false; let selectedItemId = null, selectedItemTip = null;
 
+// --- GENİŞLETİLMİŞ VE AKILLANDIRILMIŞ KATEGORİ SÖZLÜĞÜ ---
 const KATEGORILER = {
-  "Manav": ["domates", "biber", "patlıcan", "soğan", "sarımsak", "patates", "elma", "muz", "limon", "meyve", "sebze", "marul", "yeşillik", "havuç", "salata", "kavun", "karpuz", "çilek", "portakal", "mandalina"],
-  "Et & Tavuk & Balık": ["et", "kıyma", "tavuk", "balık", "ciğer", "kanat", "göğüs", "baget"],
-  "Süt & Kahvaltılık": ["süt", "peynir", "yoğurt", "tereyağı", "yumurta", "zeytin", "sucuk", "salam", "sosis", "kaymak", "kaşar", "bal", "reçel", "krem peynir", "labne"],
-  "Fırın & Pastane": ["ekmek", "simit", "poğaça", "yufka", "un", "tatlı", "pasta", "yulaf", "gevrek", "galeta", "börek"],
-  "Baharat": ["karabiber", "pul biber", "pulbiber", "nane", "kekik", "kimyon", "sumak", "köri", "tarçın", "karanfil", "zerdeçal", "fesleğen"],
-  "Temizlik & Kişisel": ["deterjan", "sabun", "peçete", "tuvalet kağıdı", "çamaşır suyu", "bulaşık", "şampuan", "diş", "fırça", "duş", "temizleyici", "sünger", "çöp", "tıraş", "krem", "deodorant", "yumuşatıcı", "camsil"],
-  "İçecek": ["su", "kola", "fanta", "sprite", "meyve suyu", "çay", "kahve", "soda", "maden suyu", "ayran", "şalgam"],
-  "Bebek & Çocuk": ["bebek bezi", "ıslak mendil", "bebek maması", "emzik", "biberon", "oyuncak"],
-  "Atıştırmalık": ["çikolata", "bisküvi", "cips", "gofret", "çekirdek", "kuruyemiş", "jelibon", "şeker", "dondurma", "fıstık", "fındık", "sakız", "kraker"],
-  "Temel Gıda": ["yağ", "şeker", "tuz", "pirinç", "bulgur", "makarna", "mercimek", "salça", "nohut", "fasulye", "sirke", "ketçap", "mayonez", "hardal", "sos", "konserve"]
+  "Manav": ["domates", "biber", "patlıcan", "soğan", "sarımsak", "patates", "elma", "muz", "limon", "meyve", "sebze", "marul", "yeşillik", "havuç", "salata", "kavun", "karpuz", "çilek", "portakal", "mandalina", "maydanoz", "dereotu", "roka", "tere", "nane", "ıspanak", "pırasa", "lahana", "karnabahar", "brokoli", "kabak", "salatalık", "taze fasulye", "bamya", "mantar", "kivi", "nar", "üzüm", "erik", "kiraz", "şeftali", "kayısı", "incir", "armut", "ayva", "greyfurt", "kereviz", "turp", "pancar", "enginar"],
+  "Et & Tavuk & Balık": ["et", "kıyma", "tavuk", "balık", "ciğer", "kanat", "göğüs", "baget", "kuşbaşı", "antrikot", "bonfile", "pirzola", "pastırma", "kavurma", "hamsi", "somon", "levrek", "çipura", "kalamar", "karides", "hindi"],
+  "Süt & Kahvaltılık": ["süt", "peynir", "yoğurt", "tereyağı", "yumurta", "zeytin", "sucuk", "salam", "sosis", "kaymak", "kaşar", "bal", "reçel", "labne", "krem peynir", "kefir", "lor", "tulum", "çökelek", "tahin", "pekmez", "helva", "fıstık ezmesi", "çikolata kreması", "müsli", "gevrek", "yulaf", "süzme"],
+  "Fırın & Pastane": ["ekmek", "simit", "poğaça", "yufka", "un", "tatlı", "pasta", "galeta", "börek", "bazlama", "lavaş", "kurabiye", "kek", "kruvasan", "açma", "boyoz", "sandviç"],
+  "Baharat": ["zerdeçal", "zencefil", "karabiber", "pul biber", "pulbiber", "kekik", "kimyon", "sumak", "köri", "tarçın", "karanfil", "fesleğen", "isot", "yenibahar", "kişniş", "safran", "vanilya", "karbonat", "kabartma tozu", "maya", "susam", "çörek otu", "biberiye", "nane"],
+  "Temizlik & Ev": ["deterjan", "sabun", "peçete", "tuvalet kağıdı", "çamaşır suyu", "bulaşık", "temizleyici", "sünger", "çöp", "yumuşatıcı", "camsil", "havlu kağıt", "ıslak mendil", "folyo", "streç", "pişirme kağıdı", "pil", "ampul", "oda kokusu"],
+  "Kişisel Bakım": ["şampuan", "diş macunu", "diş fırçası", "duş jeli", "tıraş", "krem", "deodorant", "parfüm", "ped", "pamuk", "jilet", "roll-on", "gargara", "saç kremi", "kolonya"],
+  "İçecek": ["su", "kola", "fanta", "sprite", "gazoz", "meyve suyu", "çay", "kahve", "soda", "maden suyu", "ayran", "şalgam", "limonata", "nescafe", "salep", "boza", "soğuk çay", "ice tea"],
+  "Atıştırmalık": ["çikolata", "bisküvi", "cips", "gofret", "çekirdek", "kuruyemiş", "jelibon", "şeker", "dondurma", "fıstık", "fındık", "ceviz", "badem", "kaju", "leblebi", "sakız", "kraker", "popkek", "puding", "kuru kayısı", "kuru incir"],
+  "Temel Gıda": ["yağ", "zeytinyağı", "ayçiçek yağı", "şeker", "tuz", "pirinç", "bulgur", "makarna", "mercimek", "salça", "nohut", "sirke", "ketçap", "mayonez", "hardal", "sos", "konserve", "şehriye", "barbunya", "nar ekşisi", "kuru fasulye", "ton balığı", "turşu", "soya sosu"],
+  "Evcil Hayvan": ["kedi maması", "köpek maması", "kedi kumu", "yaş mama", "ödül maması"]
 };
 
 const SIZINTI_KELIMELER = ["kahve", "starbucks", "trendyol", "hepsiburada", "dışarıda", "yemeksepeti", "getir", "sinema", "oyun", "abonelik", "netflix", "spotify", "tatlı", "çikolata", "cips", "avm", "burger", "pizza"];
 
 function getKategori(ad) {
-   const str = ad.toLocaleLowerCase('tr-TR');
-   for(let k in KATEGORILER) { if(KATEGORILER[k].some(kelime => str.includes(kelime))) return k; }
+   const str = ad.toLocaleLowerCase('tr-TR').trim();
+   const strWords = str.split(' ');
+
+   for(let k in KATEGORILER) { 
+       if(KATEGORILER[k].some(kelime => {
+           if(kelime.includes(' ') && str.includes(kelime)) return true;
+           if(strWords.includes(kelime)) return true;
+           if(kelime.length > 3 && str.includes(kelime)) return true;
+           return false;
+       })) {
+           return k; 
+       }
+   }
    return "Diğer";
 }
 
-// YENİ: GRAFİK İÇİN HARCAMA KATEGORİLEME SİSTEMİ
 function getHarcamaKategori(ad) {
     const str = ad.toLocaleLowerCase('tr-TR');
     if (str.includes('market') || str.includes('bakkal') || str.includes('şok') || str.includes('bim') || str.includes('a101') || str.includes('migros')) return '🛒 Market';
