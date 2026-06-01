@@ -429,6 +429,14 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 </div>
 
 <script>
+// XSS Açığını engelleyecek yeni fonksiyonumuz
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.toString().replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[tag]));
+}
+
 const CFG = {
   apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',
   authDomain:'maasgunu-bd353.firebaseapp.com',
@@ -474,8 +482,8 @@ function getKategori(ad) {
    for(let k in KATEGORILER) { 
        if(KATEGORILER[k].some(kelime => {
            if(kelime.includes(' ') && str.includes(kelime)) return true;
-           if(strWords.includes(kelime)) return true;
-           if(kelime.length > 3 && str.includes(kelime)) return true;
+           // Düzeltildi: Kelimenin tamamı eşleşmeli veya Türkçe ek almış uzun bir kelime (örneğin kiviye -> kivi) olmalı
+           if(strWords.some(w => w === kelime || (w.length > 3 && w.startsWith(kelime)))) return true;
            return false;
        })) {
            return k; 
@@ -630,7 +638,7 @@ function canliBaglantiKur() {
         if(isFirstLoad) {
            const partnerEkledikleri = veri.liste.filter(x => !x.alindi && x.ekleyen !== userName() && (x.eklemeTarihi || 0) > sonGiris);
            if(partnerEkledikleri.length > 0) {
-               document.getElementById('wpDesc').textContent = `Sen yokken ${partnerEkledikleri[0].ekleyen} listeye ${partnerEkledikleri.length} yeni ürün ekledi.`;
+               document.getElementById('wpDesc').textContent = `Sen yokken ${escapeHTML(partnerEkledikleri[0].ekleyen)} listeye ${partnerEkledikleri.length} yeni ürün ekledi.`;
                document.getElementById('welcomePopup').classList.add('show');
                setTimeout(() => document.getElementById('welcomePopup').classList.remove('show'), 6000);
            }
@@ -639,7 +647,7 @@ function canliBaglantiKur() {
            const gUrunS = veri.liste.length;
            if (oncekiUrunSayisi !== -1 && gUrunS > oncekiUrunSayisi) {
               const sUrun = veri.liste[gUrunS - 1];
-              if (sUrun && sUrun.ekleyen !== userName()) { showToast("🛒 " + sUrun.ekleyen + " yeni ürün ekledi!"); try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){} }
+              if (sUrun && sUrun.ekleyen !== userName()) { showToast("🛒 " + escapeHTML(sUrun.ekleyen) + " yeni ürün ekledi!"); try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){} }
            }
            oncekiUrunSayisi = gUrunS; localStorage.setItem('ev_son_giris', Date.now().toString());
         }
@@ -665,7 +673,7 @@ function hizliEkle(val, tip) {
 
 function sesleYazdir(inputId) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SpeechRecognition) return showToast("⚠️ Tarayıcınız sesle yazmayı desteklemiyor");
+  if(!SpeechRecognition) return showToast("⚠️ Cihazınızda sesle yazdırmayı destekleyen bir tarayıcı yok. iOS kullanıyorsanız klavyedeki mikrofonu deneyebilirsiniz.");
   const rec = new SpeechRecognition(); rec.lang = 'tr-TR'; rec.start(); showToast("🎙 Dinliyorum...");
   rec.onresult = (e) => { document.getElementById(inputId).value = e.results[0][0].transcript; if(inputId === 'yeniUrun') urunEkle(); if(inputId === 'hAd') document.getElementById('hTutar').focus(); };
   rec.onerror = () => showToast("❌ Ses anlaşılamadı");
@@ -728,8 +736,10 @@ function ayDegis(delta) {
   if (!veri.aylar[aktifAy]) {
     let prevLimit = 0; let keys = Object.keys(veri.aylar).sort();
     if(keys.length > 0) prevLimit = veri.aylar[keys[keys.length-1]].limit;
-    veri.aylar[aktifAy] = { limit: prevLimit, harcamalar: [], silinenHarcamalar: [] }; veriyiGuncelle();
-  } else { render(); }
+    // Düzeltildi: Sadece bellekte oluşturuluyor, anında DB'ye kaydedilmiyor. (Database Bloat'ı önlemek için)
+    veri.aylar[aktifAy] = { limit: prevLimit, harcamalar: [], silinenHarcamalar: [] }; 
+  }
+  render();
 }
 
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 3000); }
@@ -880,7 +890,7 @@ function createListItem(id, htmlContent, tip, clickFn = "") { return `<div class
 
 function buildDeletedHtml(list, tip) {
   if(!list || list.length === 0) return '';
-  return `<div class="deleted-sec"><div class="deleted-head" onclick="this.nextElementSibling.classList.toggle('on')"><span>🗑 Son Silinenler (${list.length})</span> <span>Gör ▼</span></div><div class="deleted-body">${list.map(x => `<div class="d-item"><div class="d-info"><div class="d-name">${x.ad} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div><div class="d-meta">${x.ekleyen} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div></div><div class="d-actions"><button class="d-btn" onclick="${tip==='harcama' ? 'harcamaGeriAl' : 'urunGeriAl'}('${x.id}')">Geri Al</button><button class="d-btn red" onclick="${tip==='harcama' ? 'harcamaKaliciSil' : 'urunKaliciSil'}('${x.id}')">Sil</button></div></div>`).join('')}</div></div>`;
+  return `<div class="deleted-sec"><div class="deleted-head" onclick="this.nextElementSibling.classList.toggle('on')"><span>🗑 Son Silinenler (${list.length})</span> <span>Gör ▼</span></div><div class="deleted-body">${list.map(x => `<div class="d-item"><div class="d-info"><div class="d-name">${escapeHTML(x.ad)} ${tip==='harcama' ? '(₺'+x.tutar+')' : ''}</div><div class="d-meta">${escapeHTML(x.ekleyen)} · ${new Date(x.silinmeTarihi).toLocaleDateString('tr-TR')}</div></div><div class="d-actions"><button class="d-btn" onclick="${tip==='harcama' ? 'harcamaGeriAl' : 'urunGeriAl'}('${x.id}')">Geri Al</button><button class="d-btn red" onclick="${tip==='harcama' ? 'harcamaKaliciSil' : 'urunKaliciSil'}('${x.id}')">Sil</button></div></div>`).join('')}</div></div>`;
 }
 
 function rozetleriHesapla() {
@@ -940,12 +950,14 @@ function render() {
       const sortedKats = Object.keys(gruplar).sort((a,b) => a==="Diğer" ? 1 : b==="Diğer" ? -1 : a.localeCompare(b));
       sortedKats.forEach(kat => {
          html += `<div class="group-lbl">🛒 ${kat.toUpperCase()}</div>`;
-         html += gruplar[kat].map(x => createListItem(x.id, `<div class="l-info"><div class="chk"></div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span>${formatZaman(x.eklemeTarihi)}</span></div></div></div>`, 'urun', `toggleAlindi('${x.id}')`)).join('');
+         // XSS Düzeltmesi
+         html += gruplar[kat].map(x => createListItem(x.id, `<div class="l-info"><div class="chk"></div><div class="l-texts"><div class="l-name">${escapeHTML(x.ad)}</div><div class="l-meta"><span class="l-who">${escapeHTML(x.ekleyen)}</span> <span>${formatZaman(x.eklemeTarihi)}</span></div></div></div>`, 'urun', `toggleAlindi('${x.id}')`)).join('');
       });
     }
     
     if(alinanlar.length > 0) {
-      html += `<div class="bought-sec ${isBoughtOpen ? 'open' : ''}"><div class="bought-head" onclick="toggleBoughtFolder(event)"><div class="bought-title"><span class="chevron">▼</span> Alınanlar (${alinanlar.length})</div><button class="clear-btn" onclick="tumAlinanlariSil(event)">Tümünü Sil</button></div><div class="bought-body">${alinanlar.map(x => createListItem(x.id, `<div class="l-info"><div class="chk on"></div><div class="l-texts"><div class="l-name done">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> <span style="color:var(--sec); font-weight:700;">✓ ${formatZaman(x.alinmaTarihi || x.eklemeTarihi)}</span></div></div></div>`, 'urun', `toggleAlindi('${x.id}')`)).join('')}</div></div>`;
+      // XSS Düzeltmesi
+      html += `<div class="bought-sec ${isBoughtOpen ? 'open' : ''}"><div class="bought-head" onclick="toggleBoughtFolder(event)"><div class="bought-title"><span class="chevron">▼</span> Alınanlar (${alinanlar.length})</div><button class="clear-btn" onclick="tumAlinanlariSil(event)">Tümünü Sil</button></div><div class="bought-body">${alinanlar.map(x => createListItem(x.id, `<div class="l-info"><div class="chk on"></div><div class="l-texts"><div class="l-name done">${escapeHTML(x.ad)}</div><div class="l-meta"><span class="l-who">${escapeHTML(x.ekleyen)}</span> <span style="color:var(--sec); font-weight:700;">✓ ${formatZaman(x.alinmaTarihi || x.eklemeTarihi)}</span></div></div></div>`, 'urun', `toggleAlindi('${x.id}')`)).join('')}</div></div>`;
     }
     lKutu.innerHTML = html;
   }
@@ -1038,8 +1050,9 @@ function render() {
   const kKutu = document.getElementById('kimNeHarcadiKutu');
   if(kisiler.length > 0) {
     kKutu.style.display = 'block';
+    // XSS Düzeltmesi
     document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `
-      <div class="u-row"><div class="u-name"><div class="u-avatar">${isim.charAt(0).toUpperCase()}</div> ${isim}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>
+      <div class="u-row"><div class="u-name"><div class="u-avatar">${escapeHTML(isim).charAt(0).toUpperCase()}</div> ${escapeHTML(isim)}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>
     `).join('');
   } else { kKutu.style.display = 'none'; }
 
@@ -1048,8 +1061,9 @@ function render() {
     hKutu.innerHTML = '<div class="empty">Bu periyotta harcama yok.</div>';
   } else {
     const siraliH = [...ayVeri.harcamalar].sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
+    // XSS Düzeltmesi
     hKutu.innerHTML = siraliH.map(x => createListItem(x.id, `
-      <div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${x.ad}</div><div class="l-meta"><span class="l-who">${x.ekleyen}</span> · ${formatZaman(new Date(x.tarih).getTime())}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>
+      <div class="l-info"><div class="chk on" style="border:none;background:var(--prim-bg);color:var(--prim);font-size:16px;">💸</div><div class="l-texts"><div class="l-name">${escapeHTML(x.ad)}</div><div class="l-meta"><span class="l-who">${escapeHTML(x.ekleyen)}</span> · ${formatZaman(new Date(x.tarih).getTime())}</div></div></div><div class="h-amt">₺${x.tutar.toLocaleString('tr-TR')}</div>
     `, 'harcama')).join('');
   }
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
