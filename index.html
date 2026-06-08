@@ -2,7 +2,7 @@
 <html data-theme="light" lang="tr">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="#f2f2f7" name="theme-color" id="themeColorMeta"/>
 <title>Ev Cüzdanı Premium</title>
@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="ev-logo.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
 <style>
 :root {
@@ -229,6 +229,38 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .rozet-ttl { font-size:12px; font-weight:800; color:var(--txt); line-height:1.2;}
 .rozet-desc { font-size:9.5px; font-weight:600; color:var(--txt3); line-height:1.2;}
 
+/* ONAY MODALI (confirm() yerine) */
+.confirm-ov { position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9998; display:none; align-items:flex-end; justify-content:center; padding:16px; padding-bottom:max(16px, env(safe-area-inset-bottom)); }
+.confirm-ov.on { display:flex; animation:fadeIn .2s; }
+.confirm-sheet { width:100%; max-width:400px; }
+.confirm-box { background:var(--surf-solid); border-radius:20px; overflow:hidden; margin-bottom:10px; }
+.confirm-title { font-size:13px; font-weight:800; color:var(--txt3); text-align:center; padding:16px 20px 4px; text-transform:uppercase; letter-spacing:0.5px; }
+.confirm-msg { font-size:14px; font-weight:500; color:var(--txt2); text-align:center; padding:4px 20px 16px; line-height:1.4; }
+.confirm-sep { height:.5px; background:var(--brd); }
+.confirm-actions { display:flex; }
+.confirm-btn { flex:1; padding:16px; font-size:16px; font-weight:600; color:var(--txt); background:var(--surf-solid); text-align:center; cursor:pointer; font-family:var(--fd); border:none; transition:.2s; }
+.confirm-btn:active { background:var(--bg2); }
+.confirm-btn.red { color:var(--prim); font-weight:700; }
+.confirm-btn.blue { color:#007aff; }
+.confirm-btn-sep { width:.5px; background:var(--brd); flex-shrink:0; }
+.confirm-cancel { width:100%; padding:16px; font-size:16px; font-weight:700; color:var(--txt); background:var(--surf-solid); border-radius:16px; text-align:center; cursor:pointer; font-family:var(--fd); border:none; transition:.2s; }
+.confirm-cancel:active { background:var(--bg2); }
+
+/* KOD GÖSTER MODALI */
+.kod-modal-ov { position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9998; display:none; align-items:center; justify-content:center; padding:24px; }
+.kod-modal-ov.on { display:flex; animation:fadeIn .2s; }
+.kod-modal-box { background:var(--surf-solid); border-radius:28px; padding:28px 24px 20px; width:100%; max-width:320px; text-align:center; }
+.kod-modal-icon { font-size:44px; margin-bottom:12px; }
+.kod-modal-title { font-size:17px; font-weight:800; color:var(--txt); margin-bottom:6px; }
+.kod-modal-sub { font-size:13px; color:var(--txt3); font-weight:500; margin-bottom:20px; line-height:1.4; }
+.kod-modal-kod { background:var(--bg2); border-radius:16px; padding:18px; font-size:26px; font-weight:800; letter-spacing:6px; color:var(--txt); margin-bottom:8px; font-family:monospace; }
+.kod-modal-hint { font-size:11px; color:var(--txt3); font-weight:500; margin-bottom:20px; }
+.kod-modal-btns { display:flex; flex-direction:column; gap:10px; }
+.kod-modal-btn { padding:14px; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; font-family:var(--fd); border:none; transition:.2s; }
+.kod-modal-btn:active { transform:scale(0.97); }
+.kod-modal-btn.prim { background:var(--prim); color:#fff; }
+.kod-modal-btn.sec { background:var(--bg2); color:var(--txt); }
+
 /* ACTION SHEET (BASILI TUTUNCA AÇILAN MENÜ) */
 .action-sheet-ov { position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:1000; display:flex; flex-direction:column; justify-content:flex-end; padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
 .action-sheet-ov.show { opacity:1; pointer-events:auto; }
@@ -428,6 +460,37 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
   </div>
 </div>
 
+<!-- ONAY MODALI (confirm/alert yerine) -->
+<div class="confirm-ov" id="confirmOv">
+  <div class="confirm-sheet">
+    <div class="confirm-box">
+      <div class="confirm-title" id="confirmTitle"></div>
+      <div class="confirm-msg" id="confirmMsg"></div>
+      <div class="confirm-sep"></div>
+      <div class="confirm-actions">
+        <button class="confirm-btn red" id="confirmOkBtn"></button>
+        <div class="confirm-btn-sep"></div>
+        <button class="confirm-btn blue" id="confirmCancelBtn">İptal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KOD GÖSTER MODALI -->
+<div class="kod-modal-ov" id="kodModalOv">
+  <div class="kod-modal-box">
+    <div class="kod-modal-icon">🔑</div>
+    <div class="kod-modal-title">Aile Kodunuz Hazır</div>
+    <div class="kod-modal-sub">Bu kodu eşinizle paylaşın. Her ikiniz de aynı kodu girerek ortak kullanabilirsiniz.</div>
+    <div class="kod-modal-kod" id="kodModalKod">----</div>
+    <div class="kod-modal-hint">Kodu kopyalayıp WhatsApp'tan gönderin</div>
+    <div class="kod-modal-btns">
+      <button class="kod-modal-btn prim" onclick="kodKopyala()">📋 Kodu Kopyala</button>
+      <button class="kod-modal-btn sec" onclick="kodModalKapat()">Tamam, Anladım</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // XSS Açığını engelleyecek yeni fonksiyonumuz
 function escapeHTML(str) {
@@ -436,6 +499,45 @@ function escapeHTML(str) {
       '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
   }[tag]));
 }
+
+// ─── ONAY MODALI (confirm() yerine) ─────────────────────────────────────────
+let _confirmResolve = null;
+function showConfirm(title, msg, okLabel = 'Evet') {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent = msg;
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = okLabel;
+    okBtn.onclick = () => { document.getElementById('confirmOv').classList.remove('on'); resolve(true); };
+    document.getElementById('confirmCancelBtn').onclick = () => { document.getElementById('confirmOv').classList.remove('on'); resolve(false); };
+    document.getElementById('confirmOv').classList.add('on');
+  });
+}
+
+// ─── KOD GÖSTER MODALI (alert() yerine) ─────────────────────────────────────
+let _uretilenKod = '';
+function showKodModal(kod) {
+  _uretilenKod = kod;
+  document.getElementById('kodModalKod').textContent = kod;
+  document.getElementById('kodModalOv').classList.add('on');
+  // Input'a da yaz
+  document.getElementById('evKodu').value = kod;
+}
+function kodModalKapat() {
+  document.getElementById('kodModalOv').classList.remove('on');
+}
+function kodKopyala() {
+  navigator.clipboard.writeText(_uretilenKod).then(() => {
+    showToast("📋 Kod kopyalandı!");
+  }).catch(() => {
+    // Fallback
+    const inp = document.getElementById('evKodu');
+    inp.select && inp.select();
+    showToast("📋 Kodu manuel kopyalayın: " + _uretilenKod);
+  });
+}
+
 
 const CFG = {
   apiKey:'AIzaSyADpIRNLQEIer_gplTgwKi_EKkfcyrYoqY',
@@ -589,10 +691,15 @@ async function initFb() {
 }
 
 function guvenliKodOlustur() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let kod = '';
-  for(let i=0; i<8; i++) { if(i===4) kod += '-'; kod += chars.charAt(Math.floor(Math.random() * chars.length)); }
-  document.getElementById('evKodu').value = kod;
-  alert("Güvenli kodunuz oluşturuldu!\n\nKod: " + kod + "\n\nKopyalayıp eşinize WhatsApp'tan göndermeyi unutmayın.");
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const arr = new Uint8Array(8);
+  crypto.getRandomValues(arr);
+  let kod = '';
+  for (let i = 0; i < 8; i++) {
+    if (i === 4) kod += '-';
+    kod += chars[arr[i] % chars.length];
+  }
+  showKodModal(kod);
 }
 
 async function girisYap() {
@@ -605,7 +712,8 @@ async function girisYap() {
 }
 
 async function cikisYap() {
-  if(!confirm('Çıkış yapmak istiyor musunuz?')) return;
+  const onay = await showConfirm('Çıkış Yap', 'Hesabınızdan çıkmak istediğinize emin misiniz?', 'Çıkış Yap');
+  if (!onay) return;
   localStorage.removeItem('ev_kodu'); if(unsubscribe) unsubscribe();
   await window._fb.signOut(auth); window.location.reload();
 }
@@ -690,8 +798,10 @@ function toggleAlindi(id) {
   if(item) { item.alindi = !item.alindi; if(item.alindi) { item.alinmaTarihi = Date.now(); haptic(50); } else { haptic(30); } render(); veriyiGuncelle(); }
 }
 
-function tumAlinanlariSil(e) {
-  e.stopPropagation(); if(!confirm('Alınan tüm ürünleri silmek istediğinize emin misiniz?')) return;
+async function tumAlinanlariSil(e) {
+  e.stopPropagation();
+  const onay = await showConfirm('Alınanları Sil', 'Alınan tüm ürünler silinecek. Emin misiniz?', 'Sil');
+  if (!onay) return;
   const alinanlar = veri.liste.filter(x => x.alindi); alinanlar.forEach(item => { item.silinmeTarihi = new Date().toISOString(); veri.silinenListe.push(item); });
   veri.liste = veri.liste.filter(x => !x.alindi); render(); veriyiGuncelle(); showToast("🗑 Tüm alınanlar silindi");
 }
@@ -862,7 +972,7 @@ function dinamikCipleriOlustur() {
   }
   populerMarket = populerMarket.slice(0, 7);
   
-  document.getElementById('marketChips').innerHTML = populerMarket.map(ad => `<div class="chip" onclick="hizliEkle('${ad}', 'market')"><span class="chip-emoji">+</span> ${ad}</div>`).join('');
+  document.getElementById('marketChips').innerHTML = populerMarket.map(ad => `<div class="chip" onclick="hizliEkle(this.dataset.val, 'market')" data-val="${escapeHTML(ad)}"><span class="chip-emoji">+</span> ${escapeHTML(ad)}</div>`).join('');
 
   const harcamaFrekans = {};
   let tumHarcamalar = [];
@@ -883,7 +993,7 @@ function dinamikCipleriOlustur() {
   }
   populerHarcama = populerHarcama.slice(0, 6);
   
-  document.getElementById('butceChips').innerHTML = populerHarcama.map(ad => `<div class="chip" onclick="hizliEkle('${ad}', 'butce')"><span class="chip-emoji">+</span> ${ad}</div>`).join('');
+  document.getElementById('butceChips').innerHTML = populerHarcama.map(ad => `<div class="chip" onclick="hizliEkle(this.dataset.val, 'butce')" data-val="${escapeHTML(ad)}"><span class="chip-emoji">+</span> ${escapeHTML(ad)}</div>`).join('');
 }
 
 function createListItem(id, htmlContent, tip, clickFn = "") { return `<div class="list-item" data-id="${id}" data-tip="${tip}" ${clickFn ? `onclick="${clickFn}"` : ''}>${htmlContent}</div>`; }
@@ -970,10 +1080,11 @@ function render() {
   let pct = ayVeri.limit ? (harcanan / ayVeri.limit) * 100 : 0; if(pct > 100) pct = 100;
 
   document.getElementById('bKalan').textContent = `₺${kalan.toLocaleString('tr-TR')}`;
+  document.getElementById('bKalan').style.color = kalan < 0 ? 'var(--prim)' : 'var(--txt)';
   document.getElementById('bHarcandi').textContent = `₺${harcanan.toLocaleString('tr-TR')} Harcandı`;
   document.getElementById('bLimit').textContent = `Limit: ₺${(ayVeri.limit||0).toLocaleString('tr-TR')}`;
   
-  const ringColor = pct > 90 ? 'var(--prim)' : 'var(--sec)';
+  const ringColor = (pct >= 100 || kalan < 0) ? 'var(--prim)' : pct > 75 ? '#ff9f0a' : 'var(--sec)';
   document.getElementById('budgetRing').style.background = `conic-gradient(${ringColor} ${pct}%, var(--bg2) 0%)`;
   document.getElementById('budgetRingVal').textContent = `%${Math.round(pct)}`;
 
