@@ -164,7 +164,8 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .ai-icon { font-size:16px; }
 .ai-tag { font-size:9px; font-weight:800; background:var(--sec-bg); color:var(--sec); padding:3px 8px; border-radius:99px; letter-spacing:0.5px; text-transform:uppercase; transition: all 0.3s ease; }
 .ai-txt { font-size:12.5px; color:var(--txt2); line-height:1.4; font-weight:500;}
-.ai-action { display:flex; margin-top:10px; gap:8px; }
+.ai-action { display:flex; align-items:center; margin-top:10px; gap:8px; }
+.ai-counter { margin-left:auto; font-size:11px; font-weight:700; color:var(--txt3); letter-spacing:0.3px; }
 .ai-btn { padding:6px 12px; background:var(--bg2); border-radius:99px; font-size:10.5px; font-weight:700; color:var(--txt2); cursor:pointer; }
 .ai-btn:active { transform:scale(0.95); }
 
@@ -228,6 +229,45 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .rozet-icon { font-size:32px; margin-bottom:4px; }
 .rozet-ttl { font-size:12px; font-weight:800; color:var(--txt); line-height:1.2;}
 .rozet-desc { font-size:9.5px; font-weight:600; color:var(--txt3); line-height:1.2;}
+
+/* ONBOARDING OVERLAY */
+.onboard-ov { position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:9990; display:none; align-items:flex-end; justify-content:center; padding:24px 16px; padding-bottom:max(24px, env(safe-area-inset-bottom)); }
+.onboard-ov.on { display:flex; animation:fadeIn .3s; }
+.onboard-box { background:var(--surf-solid); border-radius:28px; padding:28px 24px 20px; width:100%; max-width:400px; }
+.onboard-emoji { font-size:52px; text-align:center; margin-bottom:16px; }
+.onboard-title { font-size:22px; font-weight:800; color:var(--txt); text-align:center; margin-bottom:8px; line-height:1.2; }
+.onboard-sub { font-size:14px; color:var(--txt2); font-weight:500; text-align:center; line-height:1.5; margin-bottom:24px; }
+.onboard-steps { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
+.onboard-step { display:flex; align-items:center; gap:14px; padding:14px; background:var(--bg2); border-radius:16px; }
+.onboard-step-num { width:32px; height:32px; border-radius:50%; background:var(--prim); color:#fff; font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.onboard-step-txt { font-size:13px; font-weight:600; color:var(--txt); line-height:1.3; }
+.onboard-step-sub { font-size:11px; color:var(--txt3); font-weight:500; margin-top:2px; }
+.onboard-basla { width:100%; padding:16px; background:var(--prim); color:#fff; border:none; border-radius:16px; font-size:16px; font-weight:800; cursor:pointer; font-family:var(--fd); }
+.onboard-basla:active { opacity:0.85; }
+
+/* BÜTÇE AŞIM BANNER */
+.asim-banner { display:none; align-items:center; gap:12px; background:var(--prim-bg); border:1.5px solid var(--prim); border-radius:16px; padding:14px 16px; margin-bottom:12px; animation:fadeIn .3s; }
+.asim-banner.on { display:flex; }
+.asim-banner-ico { font-size:26px; flex-shrink:0; }
+.asim-banner-txt { flex:1; }
+.asim-banner-baslik { font-size:13px; font-weight:800; color:var(--prim); margin-bottom:2px; }
+.asim-banner-alt { font-size:12px; font-weight:500; color:var(--txt2); line-height:1.4; }
+.asim-bildir { font-size:11px; font-weight:800; color:#fff; background:var(--prim); border:none; border-radius:8px; padding:6px 12px; cursor:pointer; font-family:var(--fd); flex-shrink:0; }
+.asim-bildir:active { opacity:0.8; }
+
+/* SABİT GİDERLER */
+.sabit-sec { margin-bottom: 8px; }
+.sabit-item { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border-radius:14px; margin-bottom:8px; }
+.sabit-icon { font-size:20px; flex-shrink:0; width:36px; height:36px; background:var(--surf-solid); border-radius:10px; display:flex; align-items:center; justify-content:center; }
+.sabit-info { flex:1; min-width:0; }
+.sabit-ad { font-size:14px; font-weight:700; color:var(--txt); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sabit-tutar { font-size:12px; font-weight:600; color:var(--txt3); margin-top:2px; }
+.sabit-badge { font-size:10px; font-weight:800; color:#fff; background:#007aff; border-radius:6px; padding:2px 7px; flex-shrink:0; }
+.sabit-del { font-size:18px; color:var(--txt3); padding:4px 8px; cursor:pointer; flex-shrink:0; }
+.sabit-del:active { color:var(--prim); }
+.sabit-ekle-btn { width:100%; padding:13px; background:var(--bg2); border:1.5px dashed var(--brd); border-radius:14px; font-size:14px; font-weight:700; color:var(--txt3); cursor:pointer; font-family:var(--fd); transition:.2s; }
+.sabit-ekle-btn:active { background:var(--surf-solid); color:var(--txt); }
+.sabit-empty { text-align:center; color:var(--txt3); font-size:13px; font-weight:500; padding:16px 0 8px; }
 
 /* ONAY MODALI (confirm() yerine) */
 .confirm-ov { position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9998; display:none; align-items:flex-end; justify-content:center; padding:16px; padding-bottom:max(16px, env(safe-area-inset-bottom)); }
@@ -349,6 +389,25 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       <div class="chips-container" id="butceChips"></div>
     </div>
 
+    <!-- BÜTÇE AŞIM BANNER -->
+    <div class="asim-banner" id="asimBanner">
+      <div class="asim-banner-ico">🚨</div>
+      <div class="asim-banner-txt">
+        <div class="asim-banner-baslik">Bütçe Aşıldı!</div>
+        <div class="asim-banner-alt" id="asimBannerAlt">Bu ay limit aşıldı.</div>
+      </div>
+      <button class="asim-bildir" onclick="eseBildir()">Eşime Bildir</button>
+    </div>
+
+    <div class="card" id="sabitGiderlerKart">
+      <div class="c-ttl">
+        <span>📌 SABİT GİDERLER</span>
+        <span onclick="modalAc('mSabitEkle')" style="cursor:pointer;color:var(--prim);font-size:11px;font-weight:800;">+ EKLE</span>
+      </div>
+      <div class="sabit-sec" id="sabitListesi"></div>
+      <div class="sabit-toplam" id="sabitToplam" style="display:none; font-size:12px; font-weight:700; color:var(--txt3); text-align:right; margin-top:4px;"></div>
+    </div>
+
     <div class="ai-card" id="aiCard">
       <div class="ai-hdr">
         <div class="ai-ttl"><span class="ai-icon">✨</span>Akıllı Asistan</div>
@@ -357,6 +416,7 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       <div class="ai-txt" id="aiTxt">Finansal verileriniz analiz ediliyor...</div>
       <div class="ai-action">
         <button class="ai-btn" onclick="akilliOneriYenile()">Başka Öneri</button>
+        <span class="ai-counter" id="aiCounter">1 / 1</span>
       </div>
     </div>
 
@@ -386,6 +446,14 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       </div>
     </div>
 
+    <div class="card" id="trendChartCard" style="display:none; padding:18px 20px 24px;">
+      <div class="c-ttl" style="margin-bottom:4px;">AYLIK HARCAMA TRENDİ</div>
+      <div style="font-size:11px; color:var(--txt3); font-weight:500; margin-bottom:16px;">Son 6 aylık harcama geçmişi</div>
+      <div style="position: relative; height: 180px; width: 100%;">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
     <div class="card" id="kimNeHarcadiKutu" style="display:none; padding:14px 20px;">
       <div class="c-ttl">KİŞİ BAZLI ÖZET</div>
       <div id="kimNeHarcadi"></div>
@@ -407,6 +475,18 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
     <label class="inp-lbl">Seçili Ay Bütçe Limiti (₺)</label>
     <input type="number" id="yeniLimit" class="mod-inp">
     <button class="mod-btn" onclick="limitKaydet()">Kaydet</button>
+  </div>
+</div>
+
+<div class="ov" id="mSabitEkle" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="mod">
+    <label class="inp-lbl">Gider Adı (ör: Kira, Elektrik)</label>
+    <input type="text" id="sabitAd" class="mod-inp" placeholder="Kira">
+    <label class="inp-lbl">Aylık Tutar (₺)</label>
+    <input type="number" id="sabitTutar" class="mod-inp" placeholder="5000">
+    <label class="inp-lbl">Emoji (isteğe bağlı)</label>
+    <input type="text" id="sabitEmoji" class="mod-inp" placeholder="🏠" maxlength="2">
+    <button class="mod-btn" onclick="sabitGiderEkle()">💾 Kaydet</button>
   </div>
 </div>
 
@@ -457,6 +537,39 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
          <button class="as-btn red" onclick="actionSil()">🗑 Sil</button>
       </div>
       <button class="as-btn as-cancel" onclick="kapatActionSheet()">İptal</button>
+  </div>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="onboard-ov" id="onboardOv">
+  <div class="onboard-box">
+    <div class="onboard-emoji">🏠</div>
+    <div class="onboard-title">Ev Cüzdanı'na Hoş Geldiniz!</div>
+    <div class="onboard-sub">Eşinizle birlikte harcamalarınızı takip edin, market listenizi paylaşın.</div>
+    <div class="onboard-steps">
+      <div class="onboard-step">
+        <div class="onboard-step-num">1</div>
+        <div>
+          <div class="onboard-step-txt">Aylık bütçe limitini belirleyin</div>
+          <div class="onboard-step-sub">Bütçe → ✎ Değiştir tuşuna dokunun</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-step-num">2</div>
+        <div>
+          <div class="onboard-step-txt">İlk harcamanızı ekleyin</div>
+          <div class="onboard-step-sub">Tutarı yazın, kategori seçin, kaydedin</div>
+        </div>
+      </div>
+      <div class="onboard-step">
+        <div class="onboard-step-num">3</div>
+        <div>
+          <div class="onboard-step-txt">Eşinizi davet edin</div>
+          <div class="onboard-step-sub">Profil → Aile Kodunu eşinizle paylaşın</div>
+        </div>
+      </div>
+    </div>
+    <button class="onboard-basla" onclick="onboardKapat()">🚀 Başlayalım!</button>
   </div>
 </div>
 
@@ -524,6 +637,16 @@ function showKodModal(kod) {
   // Input'a da yaz
   document.getElementById('evKodu').value = kod;
 }
+function onboardKapat() {
+  document.getElementById('onboardOv').classList.remove('on');
+  if (evKodu) localStorage.setItem('ev_onboard_tamam_' + evKodu, '1');
+  // Limit belirleme modalını aç — kullanıcıyı hemen aksiyona yönlendir
+  setTimeout(() => {
+    document.getElementById('mBakiye').classList.add('on');
+    document.getElementById('yeniLimit').focus();
+  }, 350);
+}
+
 function kodModalKapat() {
   document.getElementById('kodModalOv').classList.remove('on');
 }
@@ -555,6 +678,7 @@ let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
 let chartInstance = null; // GRAFİK İÇİN GLOBAL DEĞİŞKEN
+let trendChartInstance = null; // TREND GRAFİĞİ İÇİN
 
 let ptrStartY = 0, isPulling = false;
 const ptr = document.getElementById('ptr'), ptrTxt = document.getElementById('ptrTxt'), ptrIcon = document.getElementById('ptrIcon');
@@ -731,6 +855,13 @@ function dataMigration(parsed) {
     if(keys.length > 0) prevLimit = v.aylar[keys[keys.length-1]].limit;
     v.aylar[aktifAy] = { limit: prevLimit, harcamalar: [], silinenHarcamalar: [] };
   }
+  // 30 günden eski silinenleri otomatik temizle (Firestore 1MB limitini korumak için)
+  const OTUZ_GUN = 30 * 24 * 60 * 60 * 1000;
+  const sinir = Date.now() - OTUZ_GUN;
+  v.silinenListe = v.silinenListe.filter(x => new Date(x.silinmeTarihi).getTime() > sinir);
+  Object.values(v.aylar).forEach(ay => {
+    if (ay.silinenHarcamalar) ay.silinenHarcamalar = ay.silinenHarcamalar.filter(x => new Date(x.silinmeTarihi).getTime() > sinir);
+  });
   return v;
 }
 
@@ -751,6 +882,13 @@ function canliBaglantiKur() {
                setTimeout(() => document.getElementById('welcomePopup').classList.remove('show'), 6000);
            }
            isFirstLoad = false; localStorage.setItem('ev_son_giris', Date.now().toString()); oncekiUrunSayisi = veri.liste.length;
+           // Onboarding: Hiç harcama ve limit yoksa ilk kullanım overlay'ini göster
+           const hicKullanilmamis = !localStorage.getItem('ev_onboard_tamam_' + evKodu);
+           const ayVeriIlk = veri.aylar[aktifAy];
+           const bostaMi = ayVeriIlk && ayVeriIlk.harcamalar.length === 0 && (ayVeriIlk.limit || 0) === 0;
+           if (hicKullanilmamis && bostaMi) {
+             setTimeout(() => document.getElementById('onboardOv').classList.add('on'), 800);
+           }
         } else {
            const gUrunS = veri.liste.length;
            if (oncekiUrunSayisi !== -1 && gUrunS > oncekiUrunSayisi) {
@@ -761,6 +899,15 @@ function canliBaglantiKur() {
         }
       } catch(e) { veri = dataMigration({}); }
     } else { veri = dataMigration({}); }
+    // Eş bildirimi kontrolü
+    if (!isFirstLoad && veri.bildirim && veri.bildirim.gonderen !== userName()) {
+      const bildirimKey = 'ev_son_bildirim_' + evKodu;
+      const sonBildirim = parseInt(localStorage.getItem(bildirimKey) || '0');
+      if (veri.bildirim.zaman > sonBildirim) {
+        showToast('🔔 ' + veri.bildirim.mesaj);
+        localStorage.setItem(bildirimKey, veri.bildirim.zaman.toString());
+      }
+    }
     render();
   });
 }
@@ -795,7 +942,55 @@ function urunEkle() {
 
 function toggleAlindi(id) {
   if(window.isLongPress) return; const item = veri.liste.find(x => x.id === id);
-  if(item) { item.alindi = !item.alindi; if(item.alindi) { item.alinmaTarihi = Date.now(); haptic(50); } else { haptic(30); } render(); veriyiGuncelle(); }
+  if(item) { 
+    item.alindi = !item.alindi; 
+    if(item.alindi) { item.alinmaTarihi = Date.now(); haptic(50); } 
+    else { haptic(30); } 
+    render(); veriyiGuncelle();
+    // Listedeki tüm ürünler alındıysa kutla
+    const kalanlar = veri.liste.filter(x => !x.alindi);
+    const alinanlar = veri.liste.filter(x => x.alindi);
+    if (item.alindi && kalanlar.length === 0 && alinanlar.length > 0) {
+      setTimeout(() => {
+        showToast('🎉 Alışveriş tamamlandı!');
+        firlatKonfeti();
+      }, 300);
+    }
+  }
+}
+
+function firlatKonfeti() {
+  const renkler = ['#ff3b30','#ff9f0a','#34c759','#007aff','#af52de','#ff2d55','#5856d6'];
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99999;';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const parcaciklar = Array.from({length: 90}, () => ({
+    x: Math.random() * canvas.width, y: -10,
+    w: 8 + Math.random() * 6, h: 5 + Math.random() * 5,
+    renk: renkler[Math.floor(Math.random() * renkler.length)],
+    aci: Math.random() * Math.PI * 2,
+    hiz: 3 + Math.random() * 5,
+    donus: (Math.random() - 0.5) * 0.3,
+    salinim: Math.random() * 3 + 1,
+    salYon: (Math.random() - 0.5) * 2
+  }));
+  let kare = 0;
+  function ciz() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    parcaciklar.forEach(p => {
+      p.y += p.hiz; p.aci += p.donus; p.x += Math.sin(kare / 15) * p.salYon;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.aci);
+      ctx.fillStyle = p.renk; ctx.globalAlpha = Math.max(0, 1 - p.y / canvas.height * 1.2);
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    kare++;
+    if (kare < 130) requestAnimationFrame(ciz);
+    else canvas.remove();
+  }
+  ciz();
 }
 
 async function tumAlinanlariSil(e) {
@@ -839,6 +1034,186 @@ function harcamaKaliciSil(id) { veri.aylar[aktifAy].silinenHarcamalar = veri.ayl
 function modalAc(id) { document.getElementById(id).classList.add('on'); if(id === 'mBakiye') document.getElementById('yeniLimit').value = veri.aylar[aktifAy].limit || 0; }
 
 function limitKaydet() { veri.aylar[aktifAy].limit = parseFloat(document.getElementById('yeniLimit').value) || 0; document.getElementById('mBakiye').classList.remove('on'); render(); veriyiGuncelle(); }
+
+// ─── SABİT GİDERLER ─────────────────────────────────────────────────────────
+// Eşe bütçe aşımı bildirimi (Firestore üzerinden)
+async function eseBildir() {
+  const ayVeri = veri.aylar[aktifAy];
+  if (!ayVeri) return;
+  const harcanan = ayVeri.harcamalar.reduce((s, x) => s + x.tutar, 0);
+  const asim = harcanan - (ayVeri.limit || 0);
+  veri.bildirim = {
+    tip: 'asim',
+    gonderen: userName(),
+    mesaj: `${userName()} bütçenin ₺${asim.toLocaleString('tr-TR')} aşıldığını bildirdi.`,
+    zaman: Date.now()
+  };
+  await veriyiGuncelle();
+  showToast('📣 Eşinize bildirim gönderildi!');
+}
+
+async function sabitGiderEkle() {
+  const ad = document.getElementById('sabitAd').value.trim();
+  const tutar = parseFloat(document.getElementById('sabitTutar').value);
+  const emoji = document.getElementById('sabitEmoji').value.trim() || '📌';
+  if (!ad) return showToast('⚠️ Gider adı boş olamaz');
+  if (!tutar || tutar <= 0) return showToast('⚠️ Geçerli bir tutar girin');
+  if (!veri.sabitGiderler) veri.sabitGiderler = [];
+  veri.sabitGiderler.push({ id: uid(), ad, tutar, emoji });
+  document.getElementById('sabitAd').value = '';
+  document.getElementById('sabitTutar').value = '';
+  document.getElementById('sabitEmoji').value = '';
+  document.getElementById('mSabitEkle').classList.remove('on');
+  render(); veriyiGuncelle();
+  showToast('📌 Sabit gider eklendi');
+}
+
+async function sabitGiderSil(id) {
+  const onay = await showConfirm('Sabit Gideri Sil', 'Bu sabit gider listeden kaldırılacak. Daha önce eklenen harcamalar silinmez.', 'Sil');
+  if (!onay) return;
+  veri.sabitGiderler = (veri.sabitGiderler || []).filter(x => x.id !== id);
+  render(); veriyiGuncelle();
+  showToast('🗑 Sabit gider silindi');
+}
+
+function sabitGiderleriAyaUygula() {
+  if (!veri.sabitGiderler || veri.sabitGiderler.length === 0) return;
+  const ayVeri = veri.aylar[aktifAy];
+  if (!ayVeri) return;
+  // Daha önce bu ay için sabit giderler eklendi mi?
+  if (!ayVeri.sabitGiderUygulandiMi) {
+    veri.sabitGiderler.forEach(sg => {
+      // Zaten bu adda bir harcama var mı kontrol et
+      const zatenVar = ayVeri.harcamalar.some(h => h.sabitGiderId === sg.id);
+      if (!zatenVar) {
+        ayVeri.harcamalar.push({
+          id: uid(), ad: sg.emoji + ' ' + sg.ad, tutar: sg.tutar,
+          tarih: new Date().toISOString(), ekleyen: userName(),
+          sabitGiderId: sg.id // Sabit gider kaynağını işaretle
+        });
+      }
+    });
+    ayVeri.sabitGiderUygulandiMi = true;
+    veriyiGuncelle();
+  }
+}
+
+function renderSabitGiderler() {
+  const liste = veri.sabitGiderler || [];
+  const el = document.getElementById('sabitListesi');
+  const toplamEl = document.getElementById('sabitToplam');
+  if (!el) return;
+  if (liste.length === 0) {
+    el.innerHTML = '<div class="sabit-empty">Kira, elektrik, internet gibi sabit giderlerinizi buraya ekleyin.<br>Her ay otomatik olarak bütçeye işlenir. ✨</div>';
+    toplamEl.style.display = 'none';
+    return;
+  }
+  const toplam = liste.reduce((s, x) => s + x.tutar, 0);
+  el.innerHTML = liste.map(sg => `
+    <div class="sabit-item">
+      <div class="sabit-icon">${escapeHTML(sg.emoji || '📌')}</div>
+      <div class="sabit-info">
+        <div class="sabit-ad">${escapeHTML(sg.ad)}</div>
+        <div class="sabit-tutar">₺${sg.tutar.toLocaleString('tr-TR')} / ay</div>
+      </div>
+      <div class="sabit-badge">OTOMATİK</div>
+      <div class="sabit-del" onclick="sabitGiderSil('${sg.id}')">✕</div>
+    </div>
+  `).join('');
+  toplamEl.style.display = 'block';
+  toplamEl.textContent = `Toplam sabit: ₺${toplam.toLocaleString('tr-TR')} / ay`;
+}
+
+// ─── AYLIK TREND GRAFİĞİ ────────────────────────────────────────────────────
+function renderTrendChart() {
+  const trendCard = document.getElementById('trendChartCard');
+  if (!veri.aylar) { trendCard.style.display = 'none'; return; }
+
+  const tumAylar = Object.keys(veri.aylar).sort();
+  if (tumAylar.length < 2) { trendCard.style.display = 'none'; return; }
+
+  const son6 = tumAylar.slice(-6);
+  const labels = son6.map(pid => getPeriodName(pid));
+  const harcamalar = son6.map(pid => veri.aylar[pid].harcamalar.reduce((s, x) => s + x.tutar, 0));
+  const limitler = son6.map(pid => veri.aylar[pid].limit || 0);
+  const herhangiLimit = limitler.some(l => l > 0);
+
+  trendCard.style.display = 'block';
+
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  const txtColor = isDark ? '#ebebf5' : '#8e8e93';
+  const gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if (trendChartInstance) trendChartInstance.destroy();
+
+  const datasets = [
+    {
+      label: 'Harcama',
+      data: harcamalar,
+      backgroundColor: son6.map((pid, i) => {
+        const h = harcamalar[i], l = limitler[i];
+        if (l > 0 && h > l) return 'rgba(255,59,48,0.85)';
+        if (l > 0 && h / l > 0.75) return 'rgba(255,159,10,0.85)';
+        return 'rgba(52,199,89,0.85)';
+      }),
+      borderRadius: 8,
+      borderSkipped: false,
+    }
+  ];
+
+  if (herhangiLimit) {
+    datasets.push({
+      label: 'Limit',
+      data: limitler,
+      type: 'line',
+      borderColor: 'rgba(0,122,255,0.65)',
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderDash: [5, 4],
+      pointRadius: 4,
+      pointBackgroundColor: 'rgba(0,122,255,0.85)',
+      tension: 0.3,
+    });
+  }
+
+  trendChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: txtColor,
+            font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
+            usePointStyle: true, pointStyle: 'circle', padding: 14
+          }
+        },
+        tooltip: {
+          backgroundColor: isDark ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.82)',
+          titleColor: isDark ? '#000' : '#fff',
+          bodyColor: isDark ? '#000' : '#fff',
+          callbacks: { label: c => ` ₺${c.raw.toLocaleString('tr-TR')}` }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: txtColor, font: { size: 10, weight: '600' } }
+        },
+        y: {
+          grid: { color: gridColor },
+          ticks: {
+            color: txtColor, font: { size: 10 },
+            callback: v => v >= 1000 ? `₺${(v / 1000).toFixed(0)}B` : `₺${v}`
+          },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
 
 function ayDegis(delta) {
   let [y, m] = aktifAy.split('-').map(Number); m += delta; if (m > 12) { m = 1; y++; } if (m < 1) { m = 12; y--; }
@@ -934,12 +1309,18 @@ function renderAsistan() {
   const c = document.getElementById('aiCard'); if(!veri.aylar || !veri.aylar[aktifAy]) { c.style.display='none'; return; }
   const list = asistanTavsiyeleri();
   if(list.length > 0) { 
-      c.style.display = 'block'; 
-      const s = list[asistanIndex % list.length]; 
+      c.style.display = 'block';
+      // Index'i listenin uzunluğuna göre sınırla
+      if(asistanIndex >= list.length) asistanIndex = 0;
+      const s = list[asistanIndex]; 
       
       const tagEl = document.getElementById('aiTag');
       tagEl.textContent = s.tag; 
-      document.getElementById('aiTxt').textContent = s.txt; 
+      document.getElementById('aiTxt').textContent = s.txt;
+
+      // Sayaç: "2 / 4" formatında
+      const counterEl = document.getElementById('aiCounter');
+      if(counterEl) counterEl.textContent = `${asistanIndex + 1} / ${list.length}`;
       
       const temaRenk = s.color || 'var(--sec)';
       tagEl.style.color = temaRenk;
@@ -955,7 +1336,11 @@ function renderAsistan() {
   }
 }
 
-function akilliOneriYenile() { asistanIndex++; renderAsistan(); }
+function akilliOneriYenile() {
+  const list = asistanTavsiyeleri();
+  asistanIndex = (asistanIndex + 1) % list.length;
+  renderAsistan();
+}
 
 function dinamikCipleriOlustur() {
   const marketFrekans = {};
@@ -1088,6 +1473,16 @@ function render() {
   document.getElementById('budgetRing').style.background = `conic-gradient(${ringColor} ${pct}%, var(--bg2) 0%)`;
   document.getElementById('budgetRingVal').textContent = `%${Math.round(pct)}`;
 
+  // Bütçe aşım banner'ı
+  const banner = document.getElementById('asimBanner');
+  if (kalan < 0 && ayVeri.limit > 0) {
+    banner.classList.add('on');
+    const asimMiktar = Math.abs(kalan);
+    document.getElementById('asimBannerAlt').textContent = `Limitinizi ₺${asimMiktar.toLocaleString('tr-TR')} aştınız. Harcamaları gözden geçirin.`;
+  } else {
+    banner.classList.remove('on');
+  }
+
   // YENİ: KATEGORİ GRAFİĞİNİ OLUŞTURMA (CHART.JS)
   const chartCard = document.getElementById('kategoriChartCard');
   if(ayVeri.harcamalar.length === 0) {
@@ -1180,6 +1575,9 @@ function render() {
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
   renderAsistan();
+  renderSabitGiderler();
+  renderTrendChart();
+  sabitGiderleriAyaUygula();
   rozetleriHesapla();
   baglaLongPress(); 
 }
