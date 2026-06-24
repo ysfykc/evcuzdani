@@ -12,8 +12,6 @@
 <link rel="apple-touch-icon" href="ev-logo.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-
 <style>
 :root {
   --bg: #f2f2f7; 
@@ -459,26 +457,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       </div>
     </div>
     
-    <div class="card" id="kategoriChartCard" style="display:none; padding:18px 20px 24px;">
-      <div class="c-ttl">KATEGORİ BAZLI ANALİZ</div>
-      <div style="position: relative; height: 210px; width: 100%; margin-top: 16px;">
-        <canvas id="kategoriChart"></canvas>
-      </div>
-    </div>
-
-    <div class="card" id="trendChartCard" style="display:none; padding:18px 20px 24px;">
-      <div class="c-ttl" style="margin-bottom:4px;">AYLIK HARCAMA TRENDİ</div>
-      <div style="font-size:11px; color:var(--txt3); font-weight:500; margin-bottom:16px;">Son 6 aylık harcama geçmişi</div>
-      <div style="position: relative; height: 180px; width: 100%;">
-        <canvas id="trendChart"></canvas>
-      </div>
-    </div>
-
-    <div class="card" id="kimNeHarcadiKutu" style="display:none; padding:14px 20px;">
-      <div class="c-ttl">KİŞİ BAZLI ÖZET</div>
-      <div id="kimNeHarcadi"></div>
-    </div>
-
     <div class="group-lbl" style="margin-top:0">Geçmiş Harcamalar</div>
     <div id="harcamaKutusu"></div>
     <div id="butceDeletedContainer"></div>
@@ -815,8 +793,6 @@ let aktifAy = getPeriodId();
 let asistanIndex = 0;
 let isBoughtOpen = false; 
 let isFirstLoad = true;
-let chartInstance = null; // GRAFİK İÇİN GLOBAL DEĞİŞKEN
-let trendChartInstance = null; // TREND GRAFİĞİ İÇİN
 
 let ptrStartY = 0, isPulling = false;
 const ptr = document.getElementById('ptr'), ptrTxt = document.getElementById('ptrTxt'), ptrIcon = document.getElementById('ptrIcon');
@@ -1192,97 +1168,6 @@ async function eseBildir() {
   showToast('📣 Eşinize bildirim gönderildi!');
 }
 
-// ─── AYLIK TREND GRAFİĞİ ────────────────────────────────────────────────────
-function renderTrendChart() {
-  const trendCard = document.getElementById('trendChartCard');
-  if (!veri.aylar) { trendCard.style.display = 'none'; return; }
-
-  const tumAylar = Object.keys(veri.aylar).sort();
-  if (tumAylar.length < 2) { trendCard.style.display = 'none'; return; }
-
-  const son6 = tumAylar.slice(-6);
-  const labels = son6.map(pid => getPeriodName(pid));
-  const harcamalar = son6.map(pid => veri.aylar[pid].harcamalar.reduce((s, x) => s + x.tutar, 0));
-  const limitler = son6.map(pid => veri.aylar[pid].limit || 0);
-  const herhangiLimit = limitler.some(l => l > 0);
-
-  trendCard.style.display = 'block';
-
-  const isDark = document.documentElement.dataset.theme === 'dark';
-  const txtColor = isDark ? '#ebebf5' : '#8e8e93';
-  const gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
-
-  const ctx = document.getElementById('trendChart').getContext('2d');
-  if (trendChartInstance) trendChartInstance.destroy();
-
-  const datasets = [
-    {
-      label: 'Harcama',
-      data: harcamalar,
-      backgroundColor: son6.map((pid, i) => {
-        const h = harcamalar[i], l = limitler[i];
-        if (l > 0 && h > l) return 'rgba(255,59,48,0.85)';
-        if (l > 0 && h / l > 0.75) return 'rgba(255,159,10,0.85)';
-        return 'rgba(52,199,89,0.85)';
-      }),
-      borderRadius: 8,
-      borderSkipped: false,
-    }
-  ];
-
-  if (herhangiLimit) {
-    datasets.push({
-      label: 'Limit',
-      data: limitler,
-      type: 'line',
-      borderColor: 'rgba(0,122,255,0.65)',
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      borderDash: [5, 4],
-      pointRadius: 4,
-      pointBackgroundColor: 'rgba(0,122,255,0.85)',
-      tension: 0.3,
-    });
-  }
-
-  trendChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: txtColor,
-            font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
-            usePointStyle: true, pointStyle: 'circle', padding: 14
-          }
-        },
-        tooltip: {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.82)',
-          titleColor: isDark ? '#000' : '#fff',
-          bodyColor: isDark ? '#000' : '#fff',
-          callbacks: { label: c => ` ₺${c.raw.toLocaleString('tr-TR')}` }
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: txtColor, font: { size: 10, weight: '600' } }
-        },
-        y: {
-          grid: { color: gridColor },
-          ticks: {
-            color: txtColor, font: { size: 10 },
-            callback: v => v >= 1000 ? `₺${(v / 1000).toFixed(0)}B` : `₺${v}`
-          },
-          beginAtZero: true
-        }
-      }
-    }
-  });
-}
-
 function ayDegis(delta) {
   let [y, m] = aktifAy.split('-').map(Number); m += delta; if (m > 12) { m = 1; y++; } if (m < 1) { m = 12; y--; }
   aktifAy = `${y}-${String(m).padStart(2, '0')}`;
@@ -1551,85 +1436,6 @@ function render() {
     banner.classList.remove('on');
   }
 
-  // YENİ: KATEGORİ GRAFİĞİNİ OLUŞTURMA (CHART.JS)
-  const chartCard = document.getElementById('kategoriChartCard');
-  if(ayVeri.harcamalar.length === 0) {
-      chartCard.style.display = 'none';
-  } else {
-      chartCard.style.display = 'block';
-      const kToplam = {};
-      ayVeri.harcamalar.forEach(h => {
-          const k = getHarcamaKategori(h.ad);
-          kToplam[k] = (kToplam[k] || 0) + h.tutar;
-      });
-
-      const sortedKats = Object.entries(kToplam).sort((a,b) => b[1] - a[1]);
-      const labels = sortedKats.map(x => x[0]);
-      const data = sortedKats.map(x => x[1]);
-
-      const ctx = document.getElementById('kategoriChart').getContext('2d');
-      if(chartInstance) chartInstance.destroy(); // Eski grafiği temizle
-
-      const isDark = document.documentElement.dataset.theme === 'dark';
-      const txtColor = isDark ? '#ebebf5' : '#8e8e93';
-      const borderColor = isDark ? '#1c1c1e' : '#ffffff';
-      // Grafikteki şık iOS renk paleti
-      const chartColors = ['#ff3b30', '#ff9f0a', '#34c759', '#007aff', '#af52de', '#ff2d55', '#5856d6'];
-
-      chartInstance = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: labels,
-              datasets: [{
-                  data: data,
-                  backgroundColor: chartColors.slice(0, labels.length),
-                  borderWidth: 3,
-                  borderColor: borderColor,
-                  hoverOffset: 6
-              }]
-          },
-          options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              cutout: '75%',
-              layout: { padding: { bottom: 10 } },
-              plugins: {
-                  legend: {
-                      position: 'bottom', // Mobilde daha iyi görünüm için altta
-                      labels: {
-                          color: txtColor,
-                          padding: 12,
-                          font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
-                          usePointStyle: true,
-                          pointStyle: 'circle'
-                      }
-                  },
-                  tooltip: {
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)',
-                      titleColor: isDark ? '#000' : '#fff',
-                      bodyColor: isDark ? '#000' : '#fff',
-                      bodyFont: { font: { family: "'Inter', sans-serif", weight: 'bold' } },
-                      callbacks: {
-                          label: function(context) { return ' ₺' + context.raw.toLocaleString('tr-TR'); }
-                      }
-                  }
-              },
-              animation: { animateScale: true, animateRotate: true }
-          }
-      });
-  }
-
-  const kMap = {}; ayVeri.harcamalar.forEach(x => { kMap[x.ekleyen] = (kMap[x.ekleyen] || 0) + x.tutar; });
-  const kisiler = Object.entries(kMap).sort((a,b)=>b[1]-a[1]);
-  const kKutu = document.getElementById('kimNeHarcadiKutu');
-  if(kisiler.length > 0) {
-    kKutu.style.display = 'block';
-    // XSS Düzeltmesi
-    document.getElementById('kimNeHarcadi').innerHTML = kisiler.map(([isim, tutar]) => `
-      <div class="u-row"><div class="u-name"><div class="u-avatar">${escapeHTML(isim).charAt(0).toUpperCase()}</div> ${escapeHTML(isim)}</div><div class="u-amt">₺${tutar.toLocaleString('tr-TR')}</div></div>
-    `).join('');
-  } else { kKutu.style.display = 'none'; }
-
   const hKutu = document.getElementById('harcamaKutusu');
   if(ayVeri.harcamalar.length === 0) {
     hKutu.innerHTML = '<div class="empty">Bu periyotta harcama yok.</div>';
@@ -1643,7 +1449,6 @@ function render() {
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
   renderAsistan();
-  renderTrendChart();
   rozetleriHesapla();
   baglaLongPress(); 
 }
