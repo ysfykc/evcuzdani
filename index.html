@@ -15,6 +15,28 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
 <style>
+/* FİŞ TARAMA */
+.fis-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:var(--bg2); border:1.5px dashed var(--brd2); border-radius:14px; font-size:14px; font-weight:700; color:var(--txt3); cursor:pointer; font-family:var(--fd); transition:.2s; margin-bottom:10px; }
+.fis-btn:active { background:var(--surf-solid); transform:scale(0.98); }
+.fis-btn.yukleniyor { color:var(--txt3); pointer-events:none; }
+.fis-btn.basarili { color:var(--sec); border-color:var(--sec); background:var(--sec-bg); }
+.fis-btn.hata { color:var(--prim); border-color:var(--prim); background:var(--prim-bg); }
+.fis-onizleme { display:none; position:relative; margin-bottom:10px; border-radius:14px; overflow:hidden; }
+.fis-onizleme.on { display:block; }
+.fis-onizleme img { width:100%; max-height:180px; object-fit:cover; border-radius:14px; }
+.fis-onizleme-kapat { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.55); color:#fff; border:none; border-radius:50%; width:28px; height:28px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.fis-sonuc { display:none; background:var(--sec-bg); border:1.5px solid var(--sec); border-radius:14px; padding:12px 14px; margin-bottom:10px; font-size:13px; font-weight:600; color:var(--txt2); line-height:1.5; }
+.fis-sonuc.on { display:block; animation:fadeIn .3s; }
+.fis-sonuc-satir { display:flex; align-items:center; gap:8px; }
+.fis-sonuc-satir + .fis-sonuc-satir { margin-top:6px; }
+.fis-sonuc-etiket { font-size:11px; font-weight:800; color:var(--txt3); text-transform:uppercase; letter-spacing:0.4px; width:60px; flex-shrink:0; }
+.fis-sonuc-deger { font-size:14px; font-weight:700; color:var(--txt); }
+.fis-ayir { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.fis-ayir-cizgi { flex:1; height:1px; background:var(--brd); }
+.fis-ayir-txt { font-size:11px; font-weight:700; color:var(--txt3); letter-spacing:0.5px; }
+</style>
+
+<style>
 :root {
   --bg: #f2f2f7; 
   --bg2: #e5e5ea; 
@@ -377,6 +399,29 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
     </div>
 
     <div class="top-add-box">
+      <!-- FİŞ TARAMA -->
+      <div class="fis-onizleme" id="fisOnizleme">
+        <img id="fisOnizlemeImg" src="" alt="Fiş önizleme">
+        <button class="fis-onizleme-kapat" onclick="fisOnizlemeSifirla()">✕</button>
+      </div>
+      <div class="fis-sonuc" id="fisSonuc">
+        <div class="fis-sonuc-satir">
+          <span class="fis-sonuc-etiket">📍 YER</span>
+          <span class="fis-sonuc-deger" id="fisSonucAd">—</span>
+        </div>
+        <div class="fis-sonuc-satir">
+          <span class="fis-sonuc-etiket">💰 TUTAR</span>
+          <span class="fis-sonuc-deger" id="fisSonucTutar">—</span>
+        </div>
+      </div>
+      <!-- Kamera input'ları (gizli) -->
+      <input type="file" id="fisKameraInput" accept="image/*" capture="environment" style="display:none" onchange="fisTara(this)">
+      <input type="file" id="fisGaleriInput" accept="image/*" style="display:none" onchange="fisTara(this)">
+      <button class="fis-btn" id="fisTaraBtn" onclick="fisTaraSecenekGoster()">
+        📷 Fişi Tara — Otomatik Doldur
+      </button>
+      <div class="fis-ayir"><div class="fis-ayir-cizgi"></div><div class="fis-ayir-txt">VEYA MANUEL GİR</div><div class="fis-ayir-cizgi"></div></div>
+      <!-- Mevcut form -->
       <div class="top-add-row">
         <button class="mic-btn" onclick="sesleYazdir('hAd')" title="Sesle Ekle">🎙</button>
         <input type="text" id="hAd" placeholder="Nereye? (Fatura vb.)">
@@ -540,6 +585,22 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
   </div>
 </div>
 
+<!-- FİŞ TARAMA SEÇENEK MODALI -->
+<div class="confirm-ov" id="fisTaraOv">
+  <div class="confirm-sheet">
+    <div class="confirm-box">
+      <div class="confirm-title">Fiş Görüntüsü</div>
+      <div class="confirm-msg">Fişi nasıl eklemek istersiniz?</div>
+      <div class="confirm-sep"></div>
+      <div class="confirm-actions" style="flex-direction:column;">
+        <button class="confirm-btn" style="border-bottom:.5px solid var(--brd);" onclick="fisKameraAc()">📷 Kamera ile Çek</button>
+        <button class="confirm-btn blue" onclick="fisGaleriAc()">🖼️ Galeriden Seç</button>
+      </div>
+    </div>
+    <button class="confirm-cancel" style="margin-top:10px;" onclick="document.getElementById('fisTaraOv').classList.remove('on')">İptal</button>
+  </div>
+</div>
+
 <!-- ONBOARDING OVERLAY -->
 <div class="onboard-ov" id="onboardOv">
   <div class="onboard-box">
@@ -637,6 +698,120 @@ function showKodModal(kod) {
   // Input'a da yaz
   document.getElementById('evKodu').value = kod;
 }
+// ─── FİŞ TARAMA — AI PROXY ──────────────────────────────────────────────────
+const AI_PROXY = 'https://dry-poetry-ac48.yusuf-aykac.workers.dev/ai';
+
+function fisTaraSecenekGoster() {
+  document.getElementById('fisTaraOv').classList.add('on');
+}
+function fisKameraAc() {
+  document.getElementById('fisTaraOv').classList.remove('on');
+  document.getElementById('fisKameraInput').click();
+}
+function fisGaleriAc() {
+  document.getElementById('fisTaraOv').classList.remove('on');
+  document.getElementById('fisGaleriInput').click();
+}
+function fisOnizlemeSifirla() {
+  document.getElementById('fisOnizleme').classList.remove('on');
+  document.getElementById('fisSonuc').classList.remove('on');
+  document.getElementById('fisOnizlemeImg').src = '';
+  document.getElementById('fisTaraBtn').className = 'fis-btn';
+  document.getElementById('fisTaraBtn').textContent = '📷 Fişi Tara — Otomatik Doldur';
+  document.getElementById('fisKameraInput').value = '';
+  document.getElementById('fisGaleriInput').value = '';
+}
+
+async function fisTara(input) {
+  const dosya = input.files[0];
+  if (!dosya) return;
+
+  // Önizleme göster
+  const onizlemeImg = document.getElementById('fisOnizlemeImg');
+  onizlemeImg.src = URL.createObjectURL(dosya);
+  document.getElementById('fisOnizleme').classList.add('on');
+  document.getElementById('fisSonuc').classList.remove('on');
+
+  // Buton yükleniyor durumu
+  const btn = document.getElementById('fisTaraBtn');
+  btn.className = 'fis-btn yukleniyor';
+  btn.innerHTML = '⏳ Fiş okunuyor...';
+
+  try {
+    // Fotoğrafı base64'e çevir
+    const base64 = await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result.split(',')[1]);
+      reader.onerror = rej;
+      reader.readAsDataURL(dosya);
+    });
+
+    const mediaType = dosya.type || 'image/jpeg';
+
+    const response = await fetch(AI_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 512,
+        system: 'Sen bir fiş ve fatura okuma asistanısın. Görüntüden işyeri adını ve toplam tutarı çıkarırsın. Yanıtını YALNIZCA geçerli JSON formatında verirsin, başka hiçbir şey yazmazsın.',
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: base64 }
+            },
+            {
+              type: 'text',
+              text: `Bu bir alışveriş fişi veya faturasıdır.
+
+Fişten şu iki bilgiyi çıkar:
+1. İŞYERİ ADI: Fişin en üstündeki mağaza/işyeri adı (örn: "BİM", "Migros", "A101", "Shell", "McDonald's"). Yoksa boş bırak.
+2. TOPLAM TUTAR: Fişin en altındaki "TOPLAM", "GENEL TOPLAM", "ÖDENECEK TUTAR" veya benzeri alandaki rakam. Sadece sayı yaz, ₺ veya TL işareti ekleme.
+
+Yanıtını YALNIZCA şu JSON formatında ver, başka hiçbir şey yazma:
+{"isyeri": "işyeri adı veya boş string", "tutar": 123.45}`
+            }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    const text = data.content?.map(c => c.text || '').join('') || '';
+    const temiz = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(temiz);
+
+    const isyeri = (parsed.isyeri || '').trim();
+    const tutar = parseFloat(parsed.tutar) || 0;
+
+    // Sonuç kutusunu göster
+    document.getElementById('fisSonucAd').textContent = isyeri || '(Tespit edilemedi)';
+    document.getElementById('fisSonucTutar').textContent = tutar > 0 ? `₺${tutar.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '(Tespit edilemedi)';
+    document.getElementById('fisSonuc').classList.add('on');
+
+    // Formu doldur
+    if (isyeri) document.getElementById('hAd').value = isyeri;
+    if (tutar > 0) document.getElementById('hTutar').value = tutar;
+
+    // Buton başarılı durumu
+    btn.className = 'fis-btn basarili';
+    btn.innerHTML = '✅ Fiş Okundu — Kontrol Edip Kaydedin';
+
+    // Tutar alanına odaklan — kullanıcı doğrulama yapabilsin
+    setTimeout(() => document.getElementById('hTutar').focus(), 300);
+
+  } catch (err) {
+    console.error('Fiş tarama hatası:', err);
+    btn.className = 'fis-btn hata';
+    btn.innerHTML = '❌ Okunamadı — Tekrar Dene';
+    showToast('❌ Fiş okunamadı. Lütfen net bir fotoğraf çekin.');
+  }
+}
+
 function onboardKapat() {
   document.getElementById('onboardOv').classList.remove('on');
   if (evKodu) localStorage.setItem('ev_onboard_tamam_' + evKodu, '1');
@@ -1018,7 +1193,10 @@ function harcamaEkle() {
   if(!ad || !tutar) return showToast("⚠️ Alanları doldurun");
   let d = new Date(); if(tarihInp) { const p = tarihInp.split('-'); d = new Date(p[0], p[1]-1, p[2], d.getHours(), d.getMinutes()); }
   veri.aylar[aktifAy].harcamalar.push({ id: uid(), ad: ad, tutar: tutar, ekleyen: userName(), tarih: d.toISOString() });
-  document.getElementById('hAd').value = ''; document.getElementById('hTutar').value = ''; document.getElementById('hTutar').blur(); render(); veriyiGuncelle();
+  document.getElementById('hAd').value = ''; document.getElementById('hTutar').value = ''; document.getElementById('hTutar').blur();
+  // Fiş önizlemesini temizle
+  fisOnizlemeSifirla();
+  render(); veriyiGuncelle();
 }
 
 function harcamaSil(id) {
