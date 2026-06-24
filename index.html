@@ -15,28 +15,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
 <style>
-/* FİŞ TARAMA */
-.fis-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:var(--bg2); border:1.5px dashed var(--brd2); border-radius:14px; font-size:14px; font-weight:700; color:var(--txt3); cursor:pointer; font-family:var(--fd); transition:.2s; margin-bottom:10px; }
-.fis-btn:active { background:var(--surf-solid); transform:scale(0.98); }
-.fis-btn.yukleniyor { color:var(--txt3); pointer-events:none; }
-.fis-btn.basarili { color:var(--sec); border-color:var(--sec); background:var(--sec-bg); }
-.fis-btn.hata { color:var(--prim); border-color:var(--prim); background:var(--prim-bg); }
-.fis-onizleme { display:none; position:relative; margin-bottom:10px; border-radius:14px; overflow:hidden; }
-.fis-onizleme.on { display:block; }
-.fis-onizleme img { width:100%; max-height:180px; object-fit:cover; border-radius:14px; }
-.fis-onizleme-kapat { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.55); color:#fff; border:none; border-radius:50%; width:28px; height:28px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.fis-sonuc { display:none; background:var(--sec-bg); border:1.5px solid var(--sec); border-radius:14px; padding:12px 14px; margin-bottom:10px; font-size:13px; font-weight:600; color:var(--txt2); line-height:1.5; }
-.fis-sonuc.on { display:block; animation:fadeIn .3s; }
-.fis-sonuc-satir { display:flex; align-items:center; gap:8px; }
-.fis-sonuc-satir + .fis-sonuc-satir { margin-top:6px; }
-.fis-sonuc-etiket { font-size:11px; font-weight:800; color:var(--txt3); text-transform:uppercase; letter-spacing:0.4px; width:60px; flex-shrink:0; }
-.fis-sonuc-deger { font-size:14px; font-weight:700; color:var(--txt); }
-.fis-ayir { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.fis-ayir-cizgi { flex:1; height:1px; background:var(--brd); }
-.fis-ayir-txt { font-size:11px; font-weight:700; color:var(--txt3); letter-spacing:0.5px; }
-</style>
-
-<style>
 :root {
   --bg: #f2f2f7; 
   --bg2: #e5e5ea; 
@@ -122,6 +100,26 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 #ptrIcon { font-size:16px; transition:transform 0.2s; }
 
 /* ÜST SABİT EKLEME ALANI (STICKY TOP) */
+/* FİŞ TARAMA */
+.fis-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:var(--bg2); border:1.5px dashed var(--brd2); border-radius:14px; font-size:14px; font-weight:700; color:var(--txt3); cursor:pointer; font-family:var(--fd); transition:.2s; margin-bottom:10px; }
+.fis-btn:active { background:var(--surf-solid); transform:scale(0.98); }
+.fis-btn.yukleniyor { color:var(--txt3); pointer-events:none; }
+.fis-btn.basarili { color:var(--sec); border-color:var(--sec); background:var(--sec-bg); }
+.fis-btn.hata { color:var(--prim); border-color:var(--prim); background:var(--prim-bg); }
+.fis-onizleme { display:none; position:relative; margin-bottom:10px; border-radius:14px; overflow:hidden; }
+.fis-onizleme.on { display:block; }
+.fis-onizleme img { width:100%; max-height:180px; object-fit:cover; border-radius:14px; }
+.fis-onizleme-kapat { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.55); color:#fff; border:none; border-radius:50%; width:28px; height:28px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.fis-sonuc { display:none; background:var(--sec-bg); border:1.5px solid var(--sec); border-radius:14px; padding:12px 14px; margin-bottom:10px; font-size:13px; font-weight:600; color:var(--txt2); line-height:1.5; }
+.fis-sonuc.on { display:block; animation:fadeIn .3s; }
+.fis-sonuc-satir { display:flex; align-items:center; gap:8px; }
+.fis-sonuc-satir + .fis-sonuc-satir { margin-top:6px; }
+.fis-sonuc-etiket { font-size:11px; font-weight:800; color:var(--txt3); text-transform:uppercase; letter-spacing:0.4px; width:60px; flex-shrink:0; }
+.fis-sonuc-deger { font-size:14px; font-weight:700; color:var(--txt); }
+.fis-ayir { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.fis-ayir-cizgi { flex:1; height:1px; background:var(--brd); }
+.fis-ayir-txt { font-size:11px; font-weight:700; color:var(--txt3); letter-spacing:0.5px; }
+
 .top-add-box { position:sticky; top:calc(var(--top) + env(safe-area-inset-top) + 8px); z-index:100; background:rgba(255,255,255,0.85); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:0.5px solid var(--brd); border-radius:24px; padding:12px; display:flex; flex-direction:column; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.08); margin-bottom:16px; transition:background .3s; }
 [data-theme=dark] .top-add-box { background:rgba(28,28,30,0.85); box-shadow:0 8px 32px rgba(0,0,0,0.4); }
 .top-add-row { display:flex; gap:8px; width:100%; align-items:center;}
