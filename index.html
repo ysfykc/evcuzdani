@@ -275,20 +275,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
 .asim-bildir { font-size:11px; font-weight:800; color:#fff; background:var(--prim); border:none; border-radius:8px; padding:6px 12px; cursor:pointer; font-family:var(--fd); flex-shrink:0; }
 .asim-bildir:active { opacity:0.8; }
 
-/* SABİT GİDERLER */
-.sabit-sec { margin-bottom: 8px; }
-.sabit-item { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border-radius:14px; margin-bottom:8px; }
-.sabit-icon { font-size:20px; flex-shrink:0; width:36px; height:36px; background:var(--surf-solid); border-radius:10px; display:flex; align-items:center; justify-content:center; }
-.sabit-info { flex:1; min-width:0; }
-.sabit-ad { font-size:14px; font-weight:700; color:var(--txt); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.sabit-tutar { font-size:12px; font-weight:600; color:var(--txt3); margin-top:2px; }
-.sabit-badge { font-size:10px; font-weight:800; color:#fff; background:#007aff; border-radius:6px; padding:2px 7px; flex-shrink:0; }
-.sabit-del { font-size:18px; color:var(--txt3); padding:4px 8px; cursor:pointer; flex-shrink:0; }
-.sabit-del:active { color:var(--prim); }
-.sabit-ekle-btn { width:100%; padding:13px; background:var(--bg2); border:1.5px dashed var(--brd); border-radius:14px; font-size:14px; font-weight:700; color:var(--txt3); cursor:pointer; font-family:var(--fd); transition:.2s; }
-.sabit-ekle-btn:active { background:var(--surf-solid); color:var(--txt); }
-.sabit-empty { text-align:center; color:var(--txt3); font-size:13px; font-weight:500; padding:16px 0 8px; }
-
 /* ONAY MODALI (confirm() yerine) */
 .confirm-ov { position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9998; display:none; align-items:flex-end; justify-content:center; padding:16px; padding-bottom:max(16px, env(safe-area-inset-bottom)); }
 .confirm-ov.on { display:flex; animation:fadeIn .2s; }
@@ -442,15 +428,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
       <button class="asim-bildir" onclick="eseBildir()">Eşime Bildir</button>
     </div>
 
-    <div class="card" id="sabitGiderlerKart">
-      <div class="c-ttl">
-        <span>📌 SABİT GİDERLER</span>
-        <span onclick="modalAc('mSabitEkle')" style="cursor:pointer;color:var(--prim);font-size:11px;font-weight:800;">+ EKLE</span>
-      </div>
-      <div class="sabit-sec" id="sabitListesi"></div>
-      <div class="sabit-toplam" id="sabitToplam" style="display:none; font-size:12px; font-weight:700; color:var(--txt3); text-align:right; margin-top:4px;"></div>
-    </div>
-
     <div class="ai-card" id="aiCard">
       <div class="ai-hdr">
         <div class="ai-ttl"><span class="ai-icon">✨</span>Akıllı Asistan</div>
@@ -518,18 +495,6 @@ main { padding-top:calc(var(--top) + 16px + env(safe-area-inset-top)); padding-b
     <label class="inp-lbl">Seçili Ay Bütçe Limiti (₺)</label>
     <input type="number" id="yeniLimit" class="mod-inp">
     <button class="mod-btn" onclick="limitKaydet()">Kaydet</button>
-  </div>
-</div>
-
-<div class="ov" id="mSabitEkle" onclick="if(event.target===this)this.classList.remove('on')">
-  <div class="mod">
-    <label class="inp-lbl">Gider Adı (ör: Kira, Elektrik)</label>
-    <input type="text" id="sabitAd" class="mod-inp" placeholder="Kira">
-    <label class="inp-lbl">Aylık Tutar (₺)</label>
-    <input type="number" id="sabitTutar" class="mod-inp" placeholder="5000">
-    <label class="inp-lbl">Emoji (isteğe bağlı)</label>
-    <input type="text" id="sabitEmoji" class="mod-inp" placeholder="🏠" maxlength="2">
-    <button class="mod-btn" onclick="sabitGiderEkle()">💾 Kaydet</button>
   </div>
 </div>
 
@@ -1211,7 +1176,6 @@ function modalAc(id) { document.getElementById(id).classList.add('on'); if(id ==
 
 function limitKaydet() { veri.aylar[aktifAy].limit = parseFloat(document.getElementById('yeniLimit').value) || 0; document.getElementById('mBakiye').classList.remove('on'); render(); veriyiGuncelle(); }
 
-// ─── SABİT GİDERLER ─────────────────────────────────────────────────────────
 // Eşe bütçe aşımı bildirimi (Firestore üzerinden)
 async function eseBildir() {
   const ayVeri = veri.aylar[aktifAy];
@@ -1226,78 +1190,6 @@ async function eseBildir() {
   };
   await veriyiGuncelle();
   showToast('📣 Eşinize bildirim gönderildi!');
-}
-
-async function sabitGiderEkle() {
-  const ad = document.getElementById('sabitAd').value.trim();
-  const tutar = parseFloat(document.getElementById('sabitTutar').value);
-  const emoji = document.getElementById('sabitEmoji').value.trim() || '📌';
-  if (!ad) return showToast('⚠️ Gider adı boş olamaz');
-  if (!tutar || tutar <= 0) return showToast('⚠️ Geçerli bir tutar girin');
-  if (!veri.sabitGiderler) veri.sabitGiderler = [];
-  veri.sabitGiderler.push({ id: uid(), ad, tutar, emoji });
-  document.getElementById('sabitAd').value = '';
-  document.getElementById('sabitTutar').value = '';
-  document.getElementById('sabitEmoji').value = '';
-  document.getElementById('mSabitEkle').classList.remove('on');
-  render(); veriyiGuncelle();
-  showToast('📌 Sabit gider eklendi');
-}
-
-async function sabitGiderSil(id) {
-  const onay = await showConfirm('Sabit Gideri Sil', 'Bu sabit gider listeden kaldırılacak. Daha önce eklenen harcamalar silinmez.', 'Sil');
-  if (!onay) return;
-  veri.sabitGiderler = (veri.sabitGiderler || []).filter(x => x.id !== id);
-  render(); veriyiGuncelle();
-  showToast('🗑 Sabit gider silindi');
-}
-
-function sabitGiderleriAyaUygula() {
-  if (!veri.sabitGiderler || veri.sabitGiderler.length === 0) return;
-  const ayVeri = veri.aylar[aktifAy];
-  if (!ayVeri) return;
-  // Daha önce bu ay için sabit giderler eklendi mi?
-  if (!ayVeri.sabitGiderUygulandiMi) {
-    veri.sabitGiderler.forEach(sg => {
-      // Zaten bu adda bir harcama var mı kontrol et
-      const zatenVar = ayVeri.harcamalar.some(h => h.sabitGiderId === sg.id);
-      if (!zatenVar) {
-        ayVeri.harcamalar.push({
-          id: uid(), ad: sg.emoji + ' ' + sg.ad, tutar: sg.tutar,
-          tarih: new Date().toISOString(), ekleyen: userName(),
-          sabitGiderId: sg.id // Sabit gider kaynağını işaretle
-        });
-      }
-    });
-    ayVeri.sabitGiderUygulandiMi = true;
-    veriyiGuncelle();
-  }
-}
-
-function renderSabitGiderler() {
-  const liste = veri.sabitGiderler || [];
-  const el = document.getElementById('sabitListesi');
-  const toplamEl = document.getElementById('sabitToplam');
-  if (!el) return;
-  if (liste.length === 0) {
-    el.innerHTML = '<div class="sabit-empty">Kira, elektrik, internet gibi sabit giderlerinizi buraya ekleyin.<br>Her ay otomatik olarak bütçeye işlenir. ✨</div>';
-    toplamEl.style.display = 'none';
-    return;
-  }
-  const toplam = liste.reduce((s, x) => s + x.tutar, 0);
-  el.innerHTML = liste.map(sg => `
-    <div class="sabit-item">
-      <div class="sabit-icon">${escapeHTML(sg.emoji || '📌')}</div>
-      <div class="sabit-info">
-        <div class="sabit-ad">${escapeHTML(sg.ad)}</div>
-        <div class="sabit-tutar">₺${sg.tutar.toLocaleString('tr-TR')} / ay</div>
-      </div>
-      <div class="sabit-badge">OTOMATİK</div>
-      <div class="sabit-del" onclick="sabitGiderSil('${sg.id}')">✕</div>
-    </div>
-  `).join('');
-  toplamEl.style.display = 'block';
-  toplamEl.textContent = `Toplam sabit: ₺${toplam.toLocaleString('tr-TR')} / ay`;
 }
 
 // ─── AYLIK TREND GRAFİĞİ ────────────────────────────────────────────────────
@@ -1751,9 +1643,7 @@ function render() {
   document.getElementById('butceDeletedContainer').innerHTML = buildDeletedHtml(ayVeri.silinenHarcamalar, 'harcama');
 
   renderAsistan();
-  renderSabitGiderler();
   renderTrendChart();
-  sabitGiderleriAyaUygula();
   rozetleriHesapla();
   baglaLongPress(); 
 }
